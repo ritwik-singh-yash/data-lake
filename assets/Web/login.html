@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+ <head>
+<link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css">
+<link rel="stylesheet" href="static/css/font-awesome.min.css" type="text/css">
+<link rel="stylesheet" href="static/css/quick-start.css" type="text/css">
+<link rel="stylesheet" href="static/css/wizard.css" type="text/css">
+
+ <head>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1.12.min.js"></script> 
+<script src="static/js/jquery-3.2.1.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
+ <script src="static/js/jquery-3.1.0.js"></script>
+<script src="static/js/aws-cognito-sdk.min.js"></script>
+<script src="static/js/amazon-cognito-identity.min.js"></script>
+<script src="static/js/config.js"></script>
+<script src="static/js/cognito-auth.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<div class="container">
+	
+    <div class="col-sm-4"></div>
+    <div class="col-sm-4">
+
+        <form  id="signinForm" method="POST" class="login-screen" >
+            <h1>Login</h1>
+            <div class="control-group form-group">
+			
+             <input type="text" id="emailInputSignin" class="form-control qs-input" value="" placeholder="username" name="username">
+            </div>
+			
+            <div class="control-group form-group">
+                <input type="password" id="passwordInputSignin"  class="form-control qs-input" value="" placeholder="password" name="password">
+            </div>
+
+            <button type="submit" value="Log in" class="btn btn-primary btn-lg">Log in</button>
+		
+            </div>
+        </form>
+		
+</div>
+
+    <div class="col-sm-4"></div>
+</div>
+
+</html>

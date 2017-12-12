@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>Login</title>
+		<script src="aws-sdk-2.160.0.js"></script>
+		<!-- <script src="aws-sdk.min.js"></script> -->
+		<script src="jsbn.js"></script>
+		<script src="jsbn2.js"></script>
+		<!-- <script src="sjcl.js"></script> -->
+		 <script src="https://cdnjs.cloudflare.com/ajax/libs/sjcl/1.0.7/sjcl.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+		<script src="aws-cognito-sdk.min.js"></script>
+		<script src="amazon-cognito-identity.min.js"></script>
+		
+		<style type="text/css">
+		
+		form {
+    border: 3px solid #f1f1f1;
+}
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+#mylogin {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.cancelbtn {
+    width: auto;
+    padding: 10px 18px;
+    background-color: #f44336;
+}
+
+
+
+.container {
+    padding: 16px;
+}
+
+span.psw {
+    float: right;
+    padding-top: 16px;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+    span.psw {
+       display: block;
+       float: none;
+    }
+    .cancelbtn {
+       width: 100%;
+    }
+}
+		</style>
+		
+	</head>
+	<body>
+	
+	<h1 align="center">LOGIN PAGE</h1>
+	
+		  <form name="MY_Form">
+			  <div class="container">
+    <label align="center"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username" name="uname" id="uname">
+
+    <label align="center"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="pass" id="pass">
+        
+   <br>
+			  <input type="submit" id="mylogin" name="button1" value="LOGIN">
+   
+  </div>
+
+  <div class="container" style="background-color:#f1f1f1">
+    <button type="button" class="cancelbtn" onclick="location.href='index.html'">BACK</button>
+  </div>
+			  
+		  </form>
+		<script>
+			document.getElementById("mylogin").addEventListener("click", function(e){
+				e.preventDefault();	
+	
+				
+				var name=document.getElementById("uname").value;			    
+			    var pwd=document.getElementById("pass").value;
+			    
+				var authenticationData = {
+				        Username : name,
+				        Password : pwd,
+				    };
+				
+				AWS.config.region = 'us-east-1';	
+			    var authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
+			    var poolData = {
+			    		UserPoolId : 'us-east-1_XASugwS63', // your user pool id here
+			    	    ClientId : '3s6vasbqqfh3vahf1kehhlrn38'
+			    };
+			    
+			    var userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+			    var userData = {
+			        Username : name,
+			        Pool : userPool
+			    };
+			    
+			    var cognitoUser = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+			 //   sessionStorage.setItem("userName", cognitoUser.getUsername());
+			 
+			 localStorage.setItem("userName", cognitoUser.getUsername());
+			    
+			      cognitoUser.authenticateUser(authenticationDetails, {
+			        onSuccess: function (result) {
+			            console.log('access token + ' + result.getIdToken().getJwtToken());		
+			            localStorage.setItem("accesstoken", result.getIdToken().getJwtToken());
+			            
+			            AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+			                IdentityPoolId : 'us-east-1:8e92837b-578c-4e8f-a33f-0303c9d2090f', // your identity pool id here
+			                Logins : {
+			                    // Change the key below according to the specific region your user pool is in.
+			                    'cognito-idp.us-east-1.amazonaws.com/us-east-1_XASugwS63' : result.getIdToken().getJwtToken()
+			                }
+			            }); 
+			            /* AWS.config.credentials.get(function(err){
+			               
+			                var accessKeyId = AWS.config.credentials.accessKeyId;
+						    var secretAccessKey = AWS.config.credentials.secretAccessKey;
+						    var sessionToken = AWS.config.credentials.sessionToken;
+						
+						  
+						    console.log("accessKeyId=  "+accessKeyId)
+						     console.log("secretAccessKey = "+secretAccessKey)
+						      console.log("sessionToken = "+sessionToken)
+						      
+						       if (err) {
+			                    alert(err);
+			                } 
+						    
+						    AWS.config.update({region: 'us-west-2'});
+
+						 
+                        
+						    
+						    var glue = new AWS.Glue({apiVersion: '2017-03-31'},region='us-west-2',endpoint='https://glue.us-west-2.amazonaws.com');
+							alert("in glue")
+						    var params = {
+						        JobName: 'raw-to-transformed-customer-job9982095875', 
+						        RunId: 'jr_07367b4ab1d0aebcbd907d4a815eb73a3e0488b484b225461d4b6cc684c302a3', 
+						        PredecessorsIncluded: true || false
+						    };
+							
+							glue.getJobRun(params, function(err, data) {
+						        if (err) console.log(err, err.stack); // an error occurred
+						        else 
+						        	{console.log("job status---  "+JSON.stringify(data));           // successful response
+						        	
+						        		
+						        		var status=JSON.stringify(data);
+						        		var obj = JSON.parse(status);
+						        		
+										var obj1=obj.JobRun; 
+						        		alert(JSON.stringify(obj1.JobRunState))
+						        		
+						        		 window.location.href="jobstatus.html";
+						        		
+						        	} 
+						       
+						    }); 
+
+			                
+			        }); */
+			            
+			            window.location.href="jobstatus.html";
+			          
+			        },
+			        
+			        onFailure: function(err) {
+			            alert(err);
+			        },
+			   
+			        
+			    });
+			      
+			
+		 	    
+			});
+			
+		/* 	AWS.config.region = 'us-east-1';
+
+			// Configure the credentials provider to use your identity pool
+			AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+			    IdentityPoolId: 'us-east-1:8e92837b-578c-4e8f-a33f-0303c9d2090f'
+			});
+
+			// Make the call to obtain credentials
+			AWS.config.credentials.get(function(){
+
+			    // Credentials will be available when this function is called.
+			    var accessKeyId = AWS.config.credentials.accessKeyId;
+			    var secretAccessKey = AWS.config.credentials.secretAccessKey;
+			    var sessionToken = AWS.config.credentials.sessionToken;
+			    
+			    console.log("accessKeyId=  "+accessKeyId)
+			     console.log("secretAccessKey = "+secretAccessKey)
+			      console.log("sessionToken = "+sessionToken)
+
+			});
+			
+			var identityId = AWS.config.credentials.identityId;
+			
+			
+			console.log("identity id "+identityId)
+			
+			
+			 */
+		
+		
+		</script>
+		
+	</body>
+</html>
