@@ -1,0 +1,21 @@
+-----------------------------------------------------------------------------
+Region: us-east-1
+StackName: tCaT-tag-taskcat-test1-a79eb75e
+*****************************************************************************
+ResourceStatusReason:  
+Stack launch was successful
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                ResourceStatusReason
+--------------------------------  ------------------  --------------------------  -------------------------------  ---------------------------
+2017-12-12 13:27:21.867000+00:00  CREATE_COMPLETE     AWS::CloudFormation::Stack  tCaT-tag-taskcat-test1-a79eb75e
+2017-12-12 13:27:19.740000+00:00  CREATE_COMPLETE     AWS::EC2::Instance          Ec2Instance
+2017-12-12 13:26:46.566000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance          Ec2Instance                      Resource creation Initiated
+2017-12-12 13:26:45.129000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance          Ec2Instance
+2017-12-12 13:26:41.512000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-tag-taskcat-test1-a79eb75e  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 12. December 2017 01:27PM
+-----------------------------------------------------------------------------
+
