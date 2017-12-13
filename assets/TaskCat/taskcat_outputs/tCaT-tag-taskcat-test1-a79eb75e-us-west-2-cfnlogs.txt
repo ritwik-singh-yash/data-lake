@@ -1,0 +1,20 @@
+-----------------------------------------------------------------------------
+Region: us-west-2
+StackName: tCaT-tag-taskcat-test1-a79eb75e
+*****************************************************************************
+ResourceStatusReason:  
+The following resource(s) failed to create: [Ec2Instance].
+*****************************************************************************
+*****************************************************************************
+Events:  
+TimeStamp                         ResourceStatus      ResourceType                LogicalResourceId                ResourceStatusReason
+--------------------------------  ------------------  --------------------------  -------------------------------  ---------------------------------------------------------------------
+2017-12-12 13:26:49.813000+00:00  CREATE_FAILED       AWS::CloudFormation::Stack  tCaT-tag-taskcat-test1-a79eb75e  The following resource(s) failed to create: [Ec2Instance].
+2017-12-12 13:26:49.005000+00:00  CREATE_FAILED       AWS::EC2::Instance          Ec2Instance                      The security group 'sg-1b11e26b' does not exist in VPC 'vpc-49be512f'
+2017-12-12 13:26:48.286000+00:00  CREATE_IN_PROGRESS  AWS::EC2::Instance          Ec2Instance
+2017-12-12 13:26:43.457000+00:00  CREATE_IN_PROGRESS  AWS::CloudFormation::Stack  tCaT-tag-taskcat-test1-a79eb75e  User Initiated
+*****************************************************************************
+-----------------------------------------------------------------------------
+Tested on: Tuesday, 12. December 2017 01:27PM
+-----------------------------------------------------------------------------
+

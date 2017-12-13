@@ -1,0 +1,16 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation templates to create EC2.",
+    
+	"Resources": {
+    "Ec2Instance" : {
+      "Type" : "AWS::EC2::Instance", 
+      "Properties" : {
+        "ImageId" : "ami-aa2ea6d0",
+        "KeyName" : "Infra-with-UI",
+        "InstanceType" : "t2.micro",
+        "SecurityGroupIds": ["sg-1b11e26b"]		     
+			}
+		}
+	}    
+}
