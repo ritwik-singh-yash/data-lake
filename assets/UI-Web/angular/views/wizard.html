@@ -1,0 +1,183 @@
+<style type="text/css">
+   .stepper-content {
+     padding:40px;
+   }
+</style>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="wsidth=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Freelancer - Start Bootstrap Theme</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="../../static/dist/css/bootstrap.css" type="text/css">
+    <link href="../../static/css/freelancer.css" rel="stylesheet">
+    <link href="../../static/stylesheets/style.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="../../static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css"> 
+    <link href="../../static/css/md-stepper.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="../../static/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="../../static/css/freelancer.css" rel="stylesheet">
+    <link href="../../static/stylesheets/style.css" rel="stylesheet">
+    <!-- toaster -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" type="text/css">
+     <script src="../../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../../static/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="../../static/js/jqBootstrapValidation.js"></script>
+    <script src="../../static/js/contact_me.js"></script>
+    
+
+    <!-- Custom scripts for this template -->
+    <!-- <script src="static/js/freelancer.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://npmcdn.com/angular-toastr/dist/angular-toastr.tpls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.3/angular-ui-router.min.js"></script>
+
+    <script src="../angular_routes.js"></script>
+    <script src="../controllers/wizardController.js"></script>
+    
+    <script src="../../static/js/aws-sdk-2.160.0.js"></script>
+    <script src="../../static/js/aws-cognito-sdk.min.js"></script>
+    <script src="../../static/js/md-stepper.js"></script>
+    <script src="../../static/js/amazon-cognito-identity.min.js"></script>
+    <script src="../../static/js/config.js"></script>
+    <script src="../../static/js/cognito-auth.js"></script>
+    <script src="../../static/js/getToken.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+  </head>
+
+  <body>
+  <div class="wrapper">
+    <div class="container" style="width: -webkit-fill-available">
+      <div class="row">
+        <header id="headerThird" class="clearfix">
+          <div class="col-md-4"> <strong class="logo"><a href="index.html"><img style="width: 40%;" src="../../static/diagrams/logo-yash.svg" alt="image"></a></strong>
+            <div>
+              <h2 style="color: white;">Data Lake</h2>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div>
+              <h2 class="heading">Quick Start Walk Through Guide</h2>
+              <h6 class="subHeading">This wizard will guide you through a Data Lake reference architecture and AWS services used within.</h6>
+            </div>
+          </div>
+        </header>
+      </div>
+      <!-- <div class="container" style="min-width: -webkit-fill-available;" ng-app="myApp" ng-controller="wizardController"> -->
+      <!-- <div ui-view=""></div> -->
+      <section id="contact" style="margin-top:0%">
+        <div class="row" ng-app="myApp" ng-controller="wizardController">
+          <div class="col-lg-12 mx-auto">
+            <md-card ng-init="step2.disabled = true; step3.disabled = true;step4.disabled = true;step5.disabled = true;step6.disabled = true;step7.disabled = true;step8.disabled = true;">
+              <md-steppers md-selected="selected" md-stretch-steppers="always">
+                <md-step label="Step 1" md-complete="step1.completed" ng-disabled="stepper.step1">
+                  <md-content>
+                    <div class="stepper-content"> <strong>
+                  Get Started
+                </strong><br/><br/><br/> <button class="dl-btn dl-btn-primary dl-btn-lg" ng-click="createCrawler()" ng-disabled="btn1">Create Raw Crawler</button><br/><br/><br/>
+                      <!-- <span ng-if="show.loader" style="color:red">{{crawlerState}}</span> -->
+                      <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                    </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Step 2" md-complete="step2.completed" ng-disabled="stepper.step2">
+                  <md-content> <strong>
+                    Content Step 2
+                    </strong>
+                    <br/><br/><br/>
+                       <!-- <md-card ng-init="stepB.disabled = true; stepC.disabled = true;">                   -->
+                          <md-steppers md-selected="subSelected" md-stretch-steppers="always" style="min-height: 100%;">
+                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="subStepper.stepA">
+                              <md-content>
+                                 <button class="btn btn-primary" ng-click="createETL()">Start Raw To Transform ETL process</button>
+                                 <br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                              </md-content>
+                            </md-step>
+                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="subStepper.stepB">
+                              <md-content>
+                                <button class="btn btn-primary" ng-click="createTrCrawler()">Create Transform Crawler</button><br/><br/><br/>
+                                <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                              </md-content>
+                            </md-step>
+                            <md-step label="Step C" md-complete="stepC.completed" ng-disabled="subStepper.stepC">
+                              <md-content>
+                                <button class="btn btn-primary" ng-click="createRedshiftJob();createRedShiftSpectrum();">Start job on transform bucket</button><br/><br/>
+                                <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                              </md-content>
+                            </md-step>
+                          </md-steppers>
+                       <!--  </md-card>  -->
+                   
+                  </md-content>
+                </md-step>
+                <md-step label="Step 3" md-complete="step3.completed" ng-disabled="stepper.step3">
+                  <md-content>
+                    <strong> Content Step 3 </strong><br/><br/><br/>
+                    
+                  </md-content>
+                </md-step>
+                <md-step label="Step 4" md-complete="step4.completed" ng-disabled="stepper.step4">
+                  <md-content>
+                    <strong> Content Step 4 </strong>
+                          
+                  </md-content>
+                </md-step>
+                <md-step label="Step 5" md-complete="step5.completed" ng-disabled="stepper.step5">
+                  <md-content>
+                    <h1> Content Step 5 </h1>
+                  </md-content>
+                </md-step>
+                <md-step label="Step 6" md-complete="step6.completed" ng-disabled="stepper.step6">
+                  <md-content>
+                    <h1> Content Step 6 </h1>
+                  </md-content>
+                </md-step>
+                <md-step label="Step 7" md-complete="step7.completed" ng-disabled="stepper.step7">
+                  <md-content>
+                    <h1> Content Step 7 </h1>
+                  </md-content>
+                </md-step>
+                <md-step label="Finish" md-complete="step8.completed" ng-disabled="stepper.step8">
+                  <md-content>
+                    <h1> Finish </h1>
+                  </md-content>
+                </md-step>
+              </md-steppers>
+            </md-card>
+          </div>
+          <div ng-if="show.loader">
+            <div class="loader" style="margin-top:20px;"></div>
+          </div>
+        </div>
+      </section>
+      <footer class="container text-center" style="width: -webkit-fill-available"> Developed By : Innovation Group , Yash Technologies Pvt Ltd </footer>
+</body>
+
+</html>
