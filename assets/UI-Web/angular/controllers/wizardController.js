@@ -62,6 +62,7 @@ app.controller('wizardController', function($scope, $http, $interval) {
   }
 
   $scope.btn1 = false
+  console.log('aws', AWS)
   $scope.createProp = function() {
     $http({
       method: 'GET',
