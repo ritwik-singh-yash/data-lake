@@ -116,3 +116,25 @@ a {
     font-size: 18px;
     line-height: 1.3333333;
     border-radius: 6px;
+  }
+
+ .stepper-content {
+     padding:40px;
+   }
+  .stretched {
+     height: 100%;
+     overflow: hidden !important;
+   }
+   .step-content {
+     margin-left: 5%;
+     margin-top: 5%;
+   }
+   .step-btn {
+     margin-left: 38%
+   }
+/*for stepper beautify*/
+.md-step::before { width : 0px !important;}
+.md-step::after { width : 0px !important;}
+
+.md-step md-step-label-wrapper span { float:right !important;}
+.md-step md-step-label-wrapper { text-align: center !important;}
