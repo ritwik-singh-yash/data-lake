@@ -8,23 +8,41 @@ app.controller('wizardController', function($scope, $http, $interval) {
   var transform_crawler_lambda_api = lambda_api + "transformcrawler";
   var redshift_raw_to_transform_ETL = lambda_api + "transformedredshift";
   var redshift_spectrum = lambda_api + "redshift";
+  var props = lambda_api + "prop";
+  AWS.config.region = _config.region.Value
   $scope.isCrawlerCreated = false
   $scope.checkCrawlerStatus = false
-  $scope.show = {
+  $scope.show = { 
     loader: false
   }
   var CognitoidToken = _getToken.idToken;
   $scope.selected = 0
   $scope.subSelected = 0
+  $scope.subRedshift = 0
+  $scope.subQuickSight = 0
+
+  var streamName="testKinsesDataGeneratorStream",
+      streamType="firehose",
+      rate=100,
+      sendDataHandle,
+      totalRecordsSent = 0,
+      cognitoAppClientId= "3s6vasbqqfh3vahf1kehhlrn38",
+      cognitoUserPoolId = "us-east-1_XASugwS63",
+      cognitoIdentityPoolId = "us-east-1:68d275f6-fa73-4803-a7f9-960b8eab74bd",
+      cognitoRegion = "us-east-1",
+      cognitoUser,
+      template = "{{name.customerID}},{{name.sku}},{{name.orderDate}},{{name.randomNumber(9)}},{{name.amountSpent}},{{name.latLong}},{{name.paymentMode}}";
+
+
   $scope.stepper = {
     step1: false,
     step2: false,
     step3: false,
     step4: false,
-    step5: true,
-    step6: true,
-    step7: true,
-    step8: true
+    step5: false,
+    step6: false,
+    step7: false,
+    step8: false
   }
 
   $scope.subStepper = {
@@ -33,7 +51,31 @@ app.controller('wizardController', function($scope, $http, $interval) {
     stepC: false
   }
 
+  $scope.redshiftStepper = {
+    stepA: false,
+    stepB: false
+  }
+
+  $scope.quickSightStepper = {
+    stepA: false,
+    stepB: false
+  }
+
   $scope.btn1 = false
+  $scope.createProp = function() {
+    $http({
+      method: 'GET',
+      url: props,
+      headers: {
+        'Authorization': CognitoidToken
+      }
+    }).then(function mySuccess(response) {
+        $scope.selected = 1
+      console.log('properties', response)
+    }, function myError(response) {
+      console.log('response', response)
+    });
+  }
   $scope.createCrawler = function() {
     console.log('createCrawler')
     $scope.show.loader = true
@@ -65,15 +107,9 @@ app.controller('wizardController', function($scope, $http, $interval) {
   $scope.getCrawlerStatus = function() {
     console.log('getCrawlerStatus')
     AWS.config.region = _config.region.Value
-    /*  var obj = {
-          [userPoolProviderName]: window._getToken.idToken
-      };*/
+  
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
       IdentityPoolId: _config.identityPoolId, // your identity pool id here
-      /* Logins: {
-        
-         'cognito-idp.us-east-1.amazonaws.com/us-east-1_XASugwS63': window._getToken.idToken
-       } */
       Logins: obj
     });
     AWS.config.credentials.get(function(err) {
@@ -104,14 +140,19 @@ app.controller('wizardController', function($scope, $http, $interval) {
              $scope.show.loader = false
             console.log('inside')
             toastr.success('Crawler Created successfully!')
-            if($scope.selected == 0) {
-              $scope.stepper.step1 = true
-              $scope.stepper.step2 = false
-              $scope.selected = 1
-            } if($scope.selected == 1) {
+            if($scope.selected == 1) {
+              console.log('selected = 1')
+              $scope.stepper.step2 = true
+              $scope.stepper.step3= false
+              $scope.selected = 2
+              $scope.subSelected = 0
+            } else {
+              console.log('selected = else')
               $scope.subStepper.stepB = true
               $scope.subStepper.stepC = false
               $scope.subSelected = 2
+              $scope.jobName = ''
+              $scope.jobState = ''
             }
             $scope.show.loader = false
             $interval.cancel($scope.stopTime);
@@ -134,7 +175,6 @@ app.controller('wizardController', function($scope, $http, $interval) {
         'Authorization': CognitoidToken
       }
     }).then(function mySuccess(res) {
-      console.log('resu', res)
       console.log('resu data', res.data)
       var response = res.data
       response.customer.isSucceeded = false
@@ -146,7 +186,6 @@ app.controller('wizardController', function($scope, $http, $interval) {
       response.order.isSucceeded = false
       $scope.jobsArr.push(response.order)
       $scope.stopJobStatus= $interval($scope.getJobStatus, 120000);
-      //$scope.getJobStatus()
       console.log(' success result', response)
       console.log(' $scope.jobsArr', $scope.jobsArr)
     }, function myError(jqXHR, textStatus, errorThrown) {
@@ -234,8 +273,9 @@ app.controller('wizardController', function($scope, $http, $interval) {
               $scope.jobState = ''
               console.log('subSelected =2')
                 $scope.subStepper.stepC = true
-                $scope.selected = 2
+                $scope.selected = 3
             }
+            $scope.$apply()
             toastr.success('Jobs Created successfully!')
           }
       }
@@ -245,7 +285,6 @@ app.controller('wizardController', function($scope, $http, $interval) {
   $scope.redShiftJobArr = []
   $scope.createRedshiftJob = function() {
     $scope.show.loader = true
-    
     $http({
       method: 'GET',
       url: redshift_raw_to_transform_ETL,
@@ -285,6 +324,7 @@ app.controller('wizardController', function($scope, $http, $interval) {
       console.error('Response: ', jqXHR.responseText);
     });
   }
+
   $scope.createTrCrawler = function() {
     $scope.jobsArr = []
     console.log('createTrCrawler')
@@ -307,5 +347,107 @@ app.controller('wizardController', function($scope, $http, $interval) {
       $scope.crawlerState = 'Identity token has expired'
     });
   }
-  // $scope.stopJobStatus= $interval($scope.getJobStatus, 60000);
+  $scope.startDataStream = function() {
+    console.log('called start')
+    $scope.show.loader = true
+      rate = 100;
+      streamType = "firehose";
+      var params = {
+                IdentityPoolId: _config.identityPoolId,
+                Logins: obj
+            };
+       AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+          IdentityPoolId: _config.identityPoolId, // your identity pool id here
+          Logins: obj
+        });
+        AWS.config.credentials.get(function(err) {
+          if (err) {
+            console.log(err);
+          }
+          AWS.config.update({
+            region: _config.region.Value
+          });
+        })
+    // $scope.createData()
+      $scope.sendDataHandle = $interval($scope.createData, 10000);
+  }
+
+  $scope.stopDataStream = function() {
+      $interval.cancel($scope.sendDataHandle);
+      $scope.show.loader = false
+      totalRecordsSent = 0;
+      $scope.selected = 4
+  }
+
+  $scope.createData = function() {
+    console.log("Inside createData")
+        var maxRecordsTotal = 100;
+        var records = [];
+
+        //clean up line breaks, and a handle older timestamp template format
+        var template = getCleanedTemplate();
+        console.log("Template : "+template)
+        console.log("Rate : "+rate)
+
+        for(var n = 0; n < rate; n++) {
+            var data = faker.fake(template);
+            var record = {
+                "Data": data + '\n'
+            };
+            if(streamType === "stream"){
+                record.PartitionKey = (Math.floor(Math.random() * (10000000000))).toString();
+            }
+            records.push(record);
+            console.log("record length  : "+records.length);
+            if(records.length === maxRecordsTotal){
+              console.log("Inside if....for sendToKinesis")
+                sendToKinesis(records);
+                records = [];
+            }
+        }
+
+        if(records.length > 0){
+            sendToKinesis(records);
+        }
+  }
+
+  function getCleanedTemplate() {
+     return template.trim().replace(/\n/g, "").replace("{{current.timestamp}}", "{{date.now}}");
+  }
+
+     function sendToKinesis(data){
+      
+      console.log("Inside sendToKinesis", data)
+        if(streamType === "stream"){
+            var payload = {
+                "Records": data,
+                "StreamName": streamName
+            };
+
+            kinesis.putRecords(payload, function(err, data) {
+                if(err){
+                    console.log(err, err.stack);
+                }
+                else{
+                    console.log(data);
+                }
+            });
+        } else {
+            payload = {
+                "Records": data,
+                "DeliveryStreamName": streamName
+            };
+
+            var firehose = new AWS.Firehose();
+            firehose.putRecordBatch(payload, function(err, data) {
+                if(err) {
+                    console.log(err, err.stack);
+                }
+                else {
+                    console.log(data);
+                }
+            });
+        }
+        totalRecordsSent += data.length;
+    }
 })
