@@ -121,8 +121,9 @@ var application = window.DataLake || {};
         event.preventDefault();
         signin(email, password,
             function signinSuccess() {
+                toastr.success('Login successful!')
                 console.log('Successfully Logged In');
-                window.location.href = './angular/views/wizard.html';
+               window.location.href = './angular/views/wizard.html';
         AWS.config.region =_config.region.Value; 
 
          var userPoolProviderName = _config.userPoolProviderName.Value;
@@ -142,7 +143,8 @@ var application = window.DataLake || {};
                 
             },
             function signinError(err) {
-                alert(err);
+                console.log('err', err, toastr);
+                toastr.error(err)
             }
         );
     }
