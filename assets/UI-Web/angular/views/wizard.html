@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Freelancer - Start Bootstrap Theme</title>
+    <title>QuickStart-Datalake</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="../../static/dist/css/bootstrap.css" type="text/css">
@@ -68,7 +68,7 @@
   type="text/javascript"></script> -->
     <script src="../../static/js/aws-sdk-2.172.0.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script> 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
   	<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
     <script
@@ -125,59 +125,39 @@
                     Step 2: 
                     </strong>Discover RAW Datasets
                      <div class="stepper-content"> <strong>
-                      </strong><br/> <button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button><br/><br/><br/>
+                      </strong><br/><button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
                             <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
                           </div>
-                         <!--  <md-steppers md-selected="subSelected" md-stretch-steppers="always" style="min-height: 100%;">
-                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="subStepper.stepA">
-                              <md-content>
-                                 <button class="btn btn-primary" ng-click="createETL()">Start Raw To Transform ETL process</button>
-                                 <br/><br/>
-                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
-                              </md-content>
-                            </md-step>
-                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="subStepper.stepB">
-                              <md-content>
-                                <button class="btn btn-primary" ng-click="createTrCrawler()">Create Transform Crawler</button><br/><br/><br/>
-                                <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
-                              </md-content>
-                            </md-step>
-                            <md-step label="Step C" md-complete="stepC.completed" ng-disabled="subStepper.stepC">
-                              <md-content>
-                                <button class="btn btn-primary" ng-click="createRedshiftJob();createRedShiftSpectrum();">Start job on transform bucket</button><br/><br/>
-                                <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
-                              </md-content>
-                            </md-step>
-                          </md-steppers> -->
-                   
                   </md-content>
                 </md-step>
                 <md-step label="Create Transformed Datasets" md-complete="step3.completed" ng-disabled="stepper.step3">
                   <md-content>
                   <div class="step-content">
                     <strong> Step 3:</strong>Create Transformed Datasets
+                     <md-card ng-init="subSelected = 0;">
                     <md-steppers md-selected="subSelected" md-stretch-steppers="always" style="min-height: 100%;">
                             <md-step label="Step A" md-complete="stepA.completed" ng-disabled="subStepper.stepA">
                               <md-content>
-                                 <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>
+                                 <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
                                  <br/><br/>
                                  <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                               </md-content>
                             </md-step>
                             <md-step label="Step B" md-complete="stepB.completed" ng-disabled="subStepper.stepB">
                               <md-content>
-                                <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button><br/><br/><br/>
+                                <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/><br/>
                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
                             </md-step>
                             <md-step label="Step C" md-complete="stepC.completed" ng-disabled="subStepper.stepC">
                               <md-content>
-                                <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button><br/><br/>
+                                <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/><br/>
                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                               </md-content>
                             </md-step>
                           </md-steppers>
+                          <md-card>
                         </div>
                   </md-content>
                 </md-step>
@@ -186,7 +166,12 @@
                   <div class="step-content">
                     <strong> Step 4: </strong>Streaming Data<br/><br/>
                           <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
-                          <button class="btn btn-primary" ng-click="stopDataStream()">Stop Order Data Stream</button>
+                          <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="enableStartStream">Stop Order Data Stream</button>
+                          <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
+                          <button class="btn btn-primary" ng-click="nextStep('outer', 4)" ng-disabled="enableStreamNext">Next</button>
+                          <br/><br/>
+                          <div class="alert alert-info" ng-if="appStarted" style="width:fit-content"> <strong>{{appStarted}}</strong></div>
+                          
                           </div>
                   </md-content>
                 </md-step>
@@ -194,6 +179,7 @@
                   <md-content>
                   <div class="step-content">
                     <strong> Step 5:</strong>Incremental data<br/><br/>
+                    <button class="btn btn-primary" ng-click="nextStep('outer', 5)" ng-disabled="btn1">Next</button>
                     </div>
                   </md-content>
                 </md-step>
@@ -202,6 +188,7 @@
                   <div class="step-content">
                     <strong> Step 6: </strong>ElasticSearch<br/><br/>
                     <button class="btn btn-primary step-btn">Visit Elasticsearch UI</button>
+                    <button class="btn btn-primary" ng-click="nextStep('outer', 6)" ng-disabled="btn1">Next</button>
                     </div>
                   </md-content>
                 </md-step>
@@ -212,12 +199,17 @@
                     <md-steppers md-selected="subRedshift" md-stretch-steppers="always" style="min-height: 100%;">
                             <md-step label="Step A" md-complete="stepA.completed" ng-disabled="redshiftStepper.stepA">
                               <md-content>
-                                 <button class="btn btn-primary step-btn">Run Analytics with Spectrum</button>
+                                 <button class="btn btn-primary step-btn" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
                             </md-step>
                             <md-step label="Step B" md-complete="stepB.completed" ng-disabled="redshiftStepper.stepB">
                               <md-content>
-                                <button class="btn btn-primary step-btn">Copy Analytics Results to Transformed Dataset</button>
+                                <button class="btn btn-primary step-btn" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
+                                &nbsp;&nbsp;<button class="btn btn-primary" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
                             </md-step>
                           </md-steppers>
@@ -229,6 +221,7 @@
                   <div class="step-content">
                     <strong> Step 8: </strong>Athena<br/><br/>
                     <button class="btn btn-primary step-btn">Register Tables in Athena For Ad-Hoc Analysis</button>
+                    &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
                     </div>
                   </md-content>
                 </md-step>
@@ -239,12 +232,16 @@
                     <md-steppers md-selected="subQuickSight" md-stretch-steppers="always" style="min-height: 100%;">
                             <md-step label="Step A" md-complete="stepA.completed" ng-disabled="quickSightStepper.stepA">
                               <md-content>
-                                 <button class="btn btn-primary step-btn">Publish Data</button>
+                                 <button class="btn btn-primary step-btn" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
+                                 <button class="btn btn-primary" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
                             </md-step>
                             <md-step label="Step B" md-complete="stepB.completed" ng-disabled="quickSightStepper.stepB">
                               <md-content>
                                 <button class="btn btn-primary step-btn">Visualize Data</button>
+                                &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
                               </md-content>
                             </md-step>
                           </md-steppers>
@@ -262,7 +259,7 @@
             </md-card>
           </div>
           <div ng-if="show.loader">
-            <div class="loader" style="margin-top:20px;"></div>
+            <div class="loader"></div>
           </div>
         </div>
       </section>
