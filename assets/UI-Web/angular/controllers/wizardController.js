@@ -12,6 +12,7 @@ var transform_crawler_lambda_api = lambda_api + "transformcrawler";
 var redshift_raw_to_transform_ETL = lambda_api + "transformedredshift";
 var redshift_spectrum = lambda_api + "redshift";
 var props = lambda_api + "prop";
+$scope.athenaLink = "https://"+_config.region.Value+".console.aws.amazon.com/athena/home?region="+_config.region.Value+"#query"
 $scope.isRedshiftNext = true
 $scope.isRedshifttransform = true
 $scope.isQuickSight = true
@@ -30,9 +31,9 @@ $scope.selected = 0
 $scope.subSelected = 0
 $scope.subRedshift = 0
 $scope.subQuickSight = 0
-var streamName = "testKinsesDataGeneratorStream",
+var streamName = "testStream",
   streamType = "firehose",
-  rate = 5000,
+  rate = 500,
   sendDataHandle,
   totalRecordsSent = 0,
   cognitoRegion = "us-east-1",
@@ -399,8 +400,9 @@ $scope.createTrCrawler = function() {
 $scope.startDataStream = function() {
   console.log('called start')
   $scope.enableStartStream = false
-  $scope.show.loader = true
-  rate = 5000;
+  //$scope.show.loader = true
+  $scope.show_text = true
+  rate = 500;
   streamType = "firehose";
   var params = {
     IdentityPoolId: _config.identityPoolId,
@@ -419,17 +421,17 @@ $scope.startDataStream = function() {
     });
   })
   // $scope.createData()
-  $scope.sendDataHandle = $interval($scope.createData, 40000);
+  $scope.sendDataHandle = $interval($scope.createData, 5000);
 }
 $scope.stopDataStream = function() {
   $interval.cancel($scope.sendDataHandle);
-  $scope.show.loader = false
+  $scope.show_text = false
   totalRecordsSent = 0;
   //$scope.selected = 4
 }
 $scope.createData = function() {
   console.log("Inside createData")
-  var maxRecordsTotal = 5000;
+  var maxRecordsTotal = 500;
   var records = [];
   //clean up line breaks, and a handle older timestamp template format
   var template = getCleanedTemplate();
@@ -459,7 +461,6 @@ $scope.createData = function() {
 function getCleanedTemplate() {
   return template.trim().replace(/\n/g, "").replace("{{current.timestamp}}", "{{date.now}}");
 }
-
 function sendToKinesis(data) {
   console.log("Inside sendToKinesis", data)
   if (streamType === "stream") {
@@ -479,12 +480,12 @@ function sendToKinesis(data) {
       "Records": data,
       "DeliveryStreamName": streamName
     };
-    var firehose = new AWS.Firehose();
+    var firehose = new AWS.Firehose({region :'us-east-1'});
     firehose.putRecordBatch(payload, function(err, data) {
       if (err) {
         console.log(err, err.stack);
       } else {
-        console.log(data);
+        console.log('kinesiss',data);
       }
     });
   }
@@ -522,7 +523,6 @@ $scope.startKinesisApp = function() {
     kinesisanalytics.describeApplication(describekinesisAppParam, function(err, data) {
       if (err) console.log("Error Occured" + err.stack); // an error occurred
       else {
-        console.log("Describe application::: outer" +  $scope.appInfo.length, i, $scope.appInfo[i]);
         kinesisApp1Id = data.ApplicationDetail.InputDescriptions[0].InputId;
         console.log("Describe application:::", kinesisApp1Id);
         var StartKinesisAppparams = {
@@ -762,6 +762,81 @@ $scope.stopKinesisApp = function() {
     $scope.crawlerState = 'Identity token has expired'
   });
  }
+  /*$scope.refreshToken = function() {
+      AWS.config.credentials.get(function(err){
+       if (err) {
+      alert(err);
+      }
+      else{
+      AWS.config.update({region:_config.region.Value});
+      AWS.config.credentials.refresh((error) => {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log('inside refresh token ');
+            }
+        });
+      }
+    }); 
+  }*/
+  
+   $scope.refreshToken = function() {
+    var encryptedAES = localStorage.getItem('secretKey')
+    var decryptedBytes = window.CryptoJS.AES.decrypt(encryptedAES, "My Secret Passphrase");
+    var pass = decryptedBytes.toString(window.CryptoJS.enc.Utf8);
+    console.log('pas', pass)
+    var authData = {
+      UserName: _getToken.username,
+      Password: pass
+        };
+    var authDetails = new AmazonCognitoIdentity.AuthenticationDetails(authData);    
+    var poolData = {
+            UserPoolId: window._config.userPoolId,
+            ClientId:window._config.userPoolClientId
+        };
+
+        var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+            var userData = {
+            Username: window._getToken.username,
+            Pool: userPool
+        };
+          cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+             cognitoUser.authenticateUser( authDetails, {
+            onSuccess: function(result) {
+                console.log('access token + ' + result.getAccessToken().getJwtToken());
+                console.log('Region + ' + window._config.region.Value);
+                 console.log('new id token + ' + result.getIdToken().getJwtToken());
+
+                var logins = {};
+                logins["cognito-idp." + window._config.region.Value + ".amazonaws.com/" + window._config.userPoolId] = result.getIdToken().getJwtToken();
+                var params = {
+                    //IdentityPoolId: "us-west-2:c7dba9fa-7110-48a0-8aeb-541f38d3dd67",
+                     IdentityPoolId: _config.identityPoolId, 
+                    Logins:{
+                       'cognito-idp.us-west-2.amazonaws.com/us-west-2_SEqL7by9F': result.getIdToken().getJwtToken()
+                    }
+                }
+                AWS.config.region = window._config.region.Value;
+                AWSCognito.config.region = window._config.region.Value;
+
+                AWS.config.credentials = new AWS.CognitoIdentityCredentials(params);
+
+                AWS.config.credentials.get(function(refreshErr) {
+                    if(refreshErr) {
+                        console.error(refreshErr);
+                    }
+                    else {
+                      console.log("inside AWS.config.credentials in refresh");
+
+                    }
+                });
+            },
+            onFailure: function(err) {
+               alert(err);
+            }
+       });
+  }
+  $scope.resfresh = $interval($scope.refreshToken, 60000);
 });
 
 
