@@ -60,7 +60,7 @@ var application = window.DataLake || {};
         };
         var attributeEmail = new AmazonCognitoIdentity.CognitoUserAttribute(dataEmail);
 
-        userPool.signUp(toUsername(email), password, [attributeEmail], null,
+        userPool.signUp(email, password, [attributeEmail], null,
             function signUpCallback(err, result) {
                 if (!err) {
                     onSuccess(result);
@@ -73,7 +73,7 @@ var application = window.DataLake || {};
 
     function signin(email, password, onSuccess, onFailure) {
         var authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails({
-            Username: toUsername(email),
+            Username: email,
             Password: password
         });
 
@@ -96,14 +96,11 @@ var application = window.DataLake || {};
 
     function createCognitoUser(email) {
         return new AmazonCognitoIdentity.CognitoUser({
-            Username: toUsername(email),
+            Username: email,
             Pool: userPool
         });
     }
 
-    function toUsername(email) {
-        return email.replace('@', '-at-');
-    }
 
     /*
      *  Event Handlers
@@ -116,9 +113,13 @@ var application = window.DataLake || {};
     });
 
     function handleSignin(event) {
+        event.preventDefault();
         var email = $('#emailInputSignin').val();
         var password = $('#passwordInputSignin').val();
-        event.preventDefault();
+         var encryptedAES = CryptoJS.AES.encrypt(password, "My Secret Passphrase");
+         console.log('encryptedAES',encryptedAES)
+         localStorage.setItem('secretKey',encryptedAES)
+        
         signin(email, password,
             function signinSuccess() {
                 toastr.success('Login successful!')
