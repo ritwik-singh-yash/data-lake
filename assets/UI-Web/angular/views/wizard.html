@@ -416,9 +416,9 @@
                         <strong class="example">Example 1 :  Hour Of The Day</strong></br> 
                         This query will help business user to identify the peak hours of the day and helps in understanding the customer purchasing behaviour.</br> </br>
                         
-                        <div class="query">SELECT HOUR(updt_date.order_date) as hour_of_day, count(*) as count
-                        FROM (select cast(order_date as timestamp) as order_date from orders) updt_date
-                        GROUP BY HOUR(updt_date.order_date)
+                        <div class="query">SELECT HOUR(updt_date.order_date) as hour_of_day, count(*) as count </br>
+                        FROM (select cast(order_date as timestamp) as order_date from orders) updt_date </br>
+                        GROUP BY HOUR(updt_date.order_date) </br>
                         ORDER BY HOUR(updt_date.order_date) asc;</div>
                         
                         Copy and paste queries in Athena and click  "Run Query".
@@ -428,19 +428,19 @@
                         Lets see averages revenue across different customer segments based on their marital status.</br> </br>
                         
                          <div class="query">SELECT c.marital_status,
-                             cast((sum(o.amount_spent)/1000) as double) as expenditure_1000
-                        FROM customers c
-                        JOIN orders o
-                          ON c.customer_id = o.customer_id
+                             cast((sum(o.amount_spent)/1000) as double) as expenditure_1000 </br>
+                        FROM customers c </br>
+                        JOIN orders o </br>
+                          ON c.customer_id = o.customer_id </br>
                         GROUP BY c.marital_status;</div></br> </br> 
                         
                         <strong class="example">Example 3 :  Product Category wise Order Distribution</strong> </br>
                         Let us see how orders are distributed among different product categories.</br></br>
                         
-                         <div class="query">SELECT products.product_category as ProductCategory, count(*) as count
-                        FROM products 
-                        JOIN orders
-                          ON orders.sku = products.sku
+                         <div class="query">SELECT products.product_category as ProductCategory, count(*) as count </br>
+                        FROM products  </br>
+                        JOIN orders </br>
+                          ON orders.sku = products.sku </br>
                         GROUP BY products.product_category;</div></br> </br> 
 
 
@@ -554,7 +554,7 @@
                               <div class="padding-all">1. Create Vertical Bar Chart visual with expenditure as value and age_ grp_category on X-axis and gender as color</br>
                                 2. Change aggregation method from SUM to AVERAGE on the expenditure column.</br>
                                 3. The Result will look like this :</div></br></br>
-                                <img src="../../static/diagrams/step10_2.emf" class="stepper-image"/></br>
+                                <img src="../../static/diagrams/step10_7.png" class="stepper-image"/></br>
 
                             </div>
                           </div>
@@ -682,7 +682,7 @@
 
                     Targeted Use Case<br/><br/>
 
-                    <strong>Submit</strong><br/><br/>
+                    <button class="btn btn-primary">Submit</button><br/><br/>
 
 
                     About Yash<br/><br/>
