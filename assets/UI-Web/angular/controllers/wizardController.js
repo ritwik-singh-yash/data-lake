@@ -31,7 +31,7 @@ $scope.selected = 0
 $scope.subSelected = 0
 $scope.subRedshift = 0
 $scope.subQuickSight = 0
-var streamName = "testStream",
+var streamName =_config.firehose1,
   streamType = "firehose",
   rate = 500,
   sendDataHandle,
@@ -398,7 +398,6 @@ $scope.createTrCrawler = function() {
   });
 }
 $scope.startDataStream = function() {
-  console.log('called start')
   $scope.enableStartStream = false
   //$scope.show.loader = true
   $scope.show_text = true
@@ -430,13 +429,10 @@ $scope.stopDataStream = function() {
   //$scope.selected = 4
 }
 $scope.createData = function() {
-  console.log("Inside createData")
   var maxRecordsTotal = 500;
   var records = [];
   //clean up line breaks, and a handle older timestamp template format
   var template = getCleanedTemplate();
-  console.log("Template : " + template)
-  console.log("Rate : " + rate)
   for (var n = 0; n < rate; n++) {
     var data = faker.fake(template);
     var record = {
@@ -446,9 +442,7 @@ $scope.createData = function() {
       record.PartitionKey = (Math.floor(Math.random() * (10000000000))).toString();
     }
     records.push(record);
-    console.log("record length  : " + records.length);
     if (records.length === maxRecordsTotal) {
-      console.log("Inside if....for sendToKinesis")
       sendToKinesis(records);
       records = [];
     }
@@ -462,7 +456,6 @@ function getCleanedTemplate() {
   return template.trim().replace(/\n/g, "").replace("{{current.timestamp}}", "{{date.now}}");
 }
 function sendToKinesis(data) {
-  console.log("Inside sendToKinesis", data)
   if (streamType === "stream") {
     var payload = {
       "Records": data,
@@ -495,9 +488,8 @@ var kinesisApplication1Name = 'kinesismergingapp2';
 var kinesisApplication2Name = '';
 var kinesisApp1Id;
 
-$scope.appInfo = ['kinesismergingapp2']
+$scope.appInfo = [_config.kinesisapplicationname1,_config.kinesisapplicationname2]
 $scope.startKinesisApp = function() {
-  console.log('app==', $scope.appInfo)
   var params = {
     IdentityPoolId: _config.identityPoolId,
     Logins: obj
@@ -524,7 +516,6 @@ $scope.startKinesisApp = function() {
       if (err) console.log("Error Occured" + err.stack); // an error occurred
       else {
         kinesisApp1Id = data.ApplicationDetail.InputDescriptions[0].InputId;
-        console.log("Describe application:::", kinesisApp1Id);
         var StartKinesisAppparams = {
           ApplicationName: $scope.appInfo[i],
           InputConfigurations: [{
@@ -539,7 +530,6 @@ $scope.startKinesisApp = function() {
           else {
             i++
             next()
-            console.log("kinesis start app response" + JSON.stringify(data));
             $scope.appStarted = 'Application started'
             $scope.enableStreamNext = false
           }
@@ -784,7 +774,6 @@ $scope.stopKinesisApp = function() {
     var encryptedAES = localStorage.getItem('secretKey')
     var decryptedBytes = window.CryptoJS.AES.decrypt(encryptedAES, "My Secret Passphrase");
     var pass = decryptedBytes.toString(window.CryptoJS.enc.Utf8);
-    console.log('pas', pass)
     var authData = {
       UserName: _getToken.username,
       Password: pass
@@ -803,10 +792,6 @@ $scope.stopKinesisApp = function() {
           cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
              cognitoUser.authenticateUser( authDetails, {
             onSuccess: function(result) {
-                console.log('access token + ' + result.getAccessToken().getJwtToken());
-                console.log('Region + ' + window._config.region.Value);
-                 console.log('new id token + ' + result.getIdToken().getJwtToken());
-
                 var logins = {};
                 logins["cognito-idp." + window._config.region.Value + ".amazonaws.com/" + window._config.userPoolId] = result.getIdToken().getJwtToken();
                 var params = {
