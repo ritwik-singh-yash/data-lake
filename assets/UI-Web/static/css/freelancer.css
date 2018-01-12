@@ -251,9 +251,9 @@ form .row:first-child .floating-label-form-group {
   background-color: #1a252f; }
 
 a {
-  color: #18BC9C; }
+  color: #286090; }
   a:focus, a:hover, a:active {
-    color: #128f76; }
+    color: #286090; }
 
 .btn {
   border-width: 2px; }
