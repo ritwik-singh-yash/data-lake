@@ -4,6 +4,7 @@ var userPoolProviderName = _config.userPoolProviderName;
 var obj = {
   [userPoolProviderName]: localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken")
 };
+console.log('localStorage.getIte',localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken"))
 var crawler_lambda_api = lambda_api + "crawler";
 var redshift_crawler_lambda_api = lambda_api + "runredshiftcrawler";
 var publish_crawler_lambda_api = lambda_api + "create_run_publish_crawler";
@@ -273,6 +274,7 @@ $scope.getJobStatus = function() {
               }
               if (obj.JobRun.JobRunState == 'FAILED') {
                 $scope.jobState = obj.JobRun.JobRunState
+                $scope.show.loader = false
                 toastr.error(obj.JobRun.ErrorMessage)
                 return
               }
@@ -838,7 +840,7 @@ $scope.stopKinesisApp = function() {
           });
 
                     }
-                });
+                 });
             },
             onFailure: function(err) {
                alert(err);
