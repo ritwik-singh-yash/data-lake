@@ -1,0 +1,733 @@
+<style type="text/css">
+
+html, body {
+    background: url(../diagrams/pattern.png);
+}
+/*.stretched,*/
+ .stretched, md-steppers-content-wrapper, md-step-content {
+      overflow: visible !important;
+}
+md-card {
+   box-shadow: none !important;
+}
+
+md-step-content.md-right, md-step-content.md-left {
+   width: 0px;
+}
+
+.md-step {
+       max-width: unset !important
+}
+
+footer {
+       position: fixed !important;
+}
+
+.step-content {
+    padding-bottom: 52px;
+}
+
+</style>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="wsidth=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>QuickStart-Datalake</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="../../static/dist/css/bootstrap.css" type="text/css">
+    <link href="../../static/css/freelancer.css" rel="stylesheet">
+    <link href="../../static/stylesheets/style.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link href="../../static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css"> 
+    <link href="../../static/css/md-stepper.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="../../static/vendor/magnific-popup/magnific-popup.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="../../static/css/freelancer.css" rel="stylesheet">
+    <link href="../../static/stylesheets/style.css" rel="stylesheet">
+    <!-- toaster -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" type="text/css">
+     <script src="../../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../../static/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../../static/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!-- Contact Form JavaScript -->
+    <script src="../../static/js/jqBootstrapValidation.js"></script>
+    <script src="../../static/js/contact_me.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
+    <!-- Custom scripts for this template -->
+    <!-- <script src="static/js/freelancer.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://npmcdn.com/angular-toastr/dist/angular-toastr.tpls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/1.0.3/angular-ui-router.min.js"></script>
+
+    <script src="../angular_routes.js"></script>
+    <script src="../controllers/wizardController.js"></script>
+    
+   <!--  <script src="../../static/js/aws-sdk-2.160.0.js"></script> -->
+   <!--  <script src="../../static/js/aws-sdk-2.6.6.min.js"></script> -->
+    <script src="../../static/js/aws-cognito-sdk.min.js"></script>
+    <script src="../../static/js/md-stepper.js"></script>
+    <script src="../../static/js/amazon-cognito-identity.min.js"></script>
+    <script src="../../static/js/config.js"></script>
+    <script src="../../static/js/cognito-auth.js"></script>
+    <script src="../../static/js/getToken.js"></script>
+    
+   <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.171.0/aws-sdk.js"
+  type="text/javascript"></script> -->
+    <script src="../../static/js/aws-sdk-2.172.0.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script> 
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+    <script
+    src="https://s3.amazonaws.com/test-bucket-yash/aman/js/producerNew.js"
+    type="text/javascript"></script>
+   <script src="../../static/js/lat_long.js" type="text/javascript"></script>
+   <script src="../../static/js/sku.js" type="text/javascript"></script>
+   <script src="../../static/js/customer_id.js" type="text/javascript"></script>
+   <script src="../../static/js/faker.js" type="text/javascript"></script>
+   </head>
+
+  <body>
+  <div class="wrapper">
+    <div class="container">
+      <div class="row">
+        <header id="headerThird" class="clearfix">
+          <div class="col-md-4"> <strong class="logo"><a href="index.html"><img style="width: 40%;" src="../../static/diagrams/logo-yash.svg" alt="image"></a></strong>
+            <div>
+              <h2 style="color: white;">Data Lake</h2>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div>
+              <h2 class="heading">Quick Start Walk Through Guide</h2>
+              <h6 class="subHeading">This wizard will guide you through a Data Lake reference architecture and AWS services used within.</h6>
+            </div>
+          </div>
+        </header>
+      </div>
+      <!-- <div class="container" style="min-width: -webkit-fill-available;" ng-app="myApp" ng-controller="wizardController"> -->
+      <!-- <div ui-view=""></div> -->
+      <section id="contact" style="margin-top:0%">
+        <div class="row" ng-app="myApp" ng-controller="wizardController">
+          <div class="col-lg-12 mx-auto">
+            <md-card ng-init="step2.disabled = true; step3.disabled = true;step4.disabled = true;step5.disabled = true;step6.disabled = true;step7.disabled = true;step8.disabled = true;" style="height: 100%">
+              <md-steppers md-selected="selected" md-stretch-steppers="always" class="stretched" md-linear="true" style="height: 100%">
+                <md-step label="Get Started" md-complete="step1.completed" ng-disabled="stepper.step1" style="text-align: center">
+                  <md-content>
+                  <div class="step-content">
+                    <strong>
+                    Step 1: 
+                    </strong>Get Started
+                    <div class="stepper-content">
+                    Yash Data lake Walk through guide is build to assist you through the Server less Data Lake reference architecture and the AWS services used within.</br>
+
+                    To demonstrate the flow in AWS Account, We are going to use a sample dataset of the Ecommerce company that sell its products at XYZ.com. </br></br>
+
+                    E-commerce is growing rapidly, but with the huge market acting as a magnet to brands large and small, competition is ramping up faster than the total growth of the market. This means customers are harder to win, easier to lose and fussier on price and user experience. To avoid falling behind the ever more fierce competition, you need to both be aware of and benefit from the latest trends in e-commerce.</br></br>
+
+                    Thus e-commerce insights like Customer segmentation (which is referred as the process of using customer data to enable a clustering of customers with shared attributes) which can be used to communicate different things to different groups and Lifetime value of the customer can help business user to understand the trend.</br></br>
+
+                    Yash Data Lake in AWS provides data ingestion, real-time analytics over continuous stream of data, batch analytics using the data available in the Data Lake, ad-hoc analytics for exploring different data insights and visualisation, which can be easily understood by key stakeholders. </br></br>
+
+
+                    The architecture diagram given below provides a high-level overview of Yash Data Lake in AWS. All of the AWS resources illustrated below were deployed to your account when you launched the Yash Data lake. As we step through this guide, sample data from E-commerce will be ingested into your account using cloud formation. After this demonstration, you can remove the data and start using Yash Data lake architecture with your own data.</br></br>
+                    <img src="../../static/diagrams/getting-started.png" class="stepper-image"/><br/><br/>
+                   <button class="btn btn-primary step-btn" ng-click="createProp()">Begin walk-through</button>
+                   </div>
+                   </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Discover RAW Datasets" md-complete="step2.completed" ng-disabled="stepper.step2">
+                  <md-content>
+                  <div class="step-content">
+                  <strong>
+                    Step 2: 
+                    </strong class="example">Discover RAW Datasets
+                     <div class="stepper-content"> 
+                     Yash Data Lake leverage Amazon S3, Amazon Glue, Amazon Redshift for data management and transformation of the data provided by the Customer.</br></br>
+
+                      AWS Glue is a fully managed extract, transform, and load (ETL) service. Glue crawlers can scan data lake and keep the Glue Data Catalog in sync with the underlying data. </br></br>
+                      Principles of Data Organisation within Yash Data lake</br></br>
+
+                        Raw datasets are stored to the Data Lake in their native format to keep the raw data intact. This enhance business users to transform dataset as per their needs and also the cost of entry remains low. </br></br>
+
+                      AWS Glue Crawler discovers Raw datasets and populates the metadata (e.g. table definition and schema) associated with it in the AWS Glue Data Catalog.</br></br>
+                        
+
+                      The AWS Glue database gets populated with four tables named Orders, Customers, Products & Demographics.<br/><br/>
+                      <strong class="example">Review Dataset contributed by Data Provider</strong>
+                       <img src="../../static/diagrams/proposed.png" style="width:10%"/><br/>
+                     <br/><button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
+                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                          </div>
+                          </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Create Transformed Datasets" md-complete="step3.completed" ng-disabled="stepper.step3">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 3:</strong>Create Transformed Datasets
+
+                     <md-card ng-init="subSelected = 0;">
+                    <md-steppers md-selected="subSelected" md-stretch-steppers="always" style="min-height: 100%;">
+                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="subStepper.stepA">
+                              <md-content style="overflow:hidden;">
+                              <div class="row">
+                              <div class="col-md-12 padding-all">
+                              <strong class="example">Creation of Transformed Datasets </strong></br></br>
+                                  AWS Glue creates four ETL Jobs for the creation of Transformed dataset and writes it in S3 Bucket named TRANSFORMED_BUCKET_DB partition by year, month & day.
+                                  </div>
+                                  <br/><br/>
+                                 <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
+                                 <br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 </div>
+                                 
+                              </md-content>
+                            </md-step>
+                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="subStepper.stepB">
+                              <md-content style="overflow:hidden;">
+                              <div class="col-md-12 padding-all">
+                               <strong class="example">Discover Transformed Datasets</strong></br></br>
+                                AWS Glue Crawler discovers Transformed data and catalogs metadata about your data stores into a central catalog.
+                                </div>
+                                 <br/></br>
+                                <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/><br/>
+                                <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                              </md-content>
+                            </md-step>
+                            <md-step label="Step C" md-complete="stepC.completed" ng-disabled="subStepper.stepC">
+                              <md-content style="overflow:hidden;">
+                              <div class="col-md-12 padding-all">
+                              <strong class="example">Load and Register Transformed Dataset within Redshift</strong></br></br>
+                            <div class="row">
+                              1. AWS Glue ETL Jobs Load Transformed Dataset to Redshift Tables.</br>
+                                <div class="padding-all">a) Orders dataset to Orders Table</br>
+                                b) Customers dataset to Customers Table</br></div>
+                            </div>
+                            <div class="row">
+                              2. Register Transformed Dataset as external tables in Redshift Spectrum:</br>
+                                 <div class="padding-all">a) Demographics</br>
+                                b) Products</div>
+                                </br>
+                                </div>
+                                </div>
+                               <br/><br/>
+                                <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/><br/>
+                                <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                              </md-content>
+                            </md-step>
+                          </md-steppers>
+                          <md-card>
+                        </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Streaming Data" md-complete="step4.completed" ng-disabled="stepper.step4">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 4: </strong>Streaming Data<br/><br/>
+                          Yash Data lake leverages Amazon Kinesis for streaming data ingestion, validation and analytics with real-time dashboards in the ElasticSearch service.</br></br>
+                            <strong class="example">a. Architecture for Streaming Data Submission</strong></br>
+
+                            This diagram illustrate how orders stream get ingested in the real-time by the kinesis firehose and stored in Redshift. Kinesis Analytics provides real-time analytics on orders data ,results of which are stored in ElasticSearch service that provides real-time dashboards on business relevant KPIs using Kibana</br></br></br>
+
+                            <strong class="example">b. Streaming Data Creation and Analytics</strong></br></br>
+                          
+                            1. Creates two Kinesis Analytics applications:</br>
+                              a) clean-order-app : This kinesis application will remove all the null values from the customerId column in Orders data.</br>
+                              
+                              b) aggregate-orders-app : This app provides real-time analytics on orders data.</br>
+                              
+                            2. On the click of Start Order Data Stream button Order Data gets generated via Javascript which streams Orders data into Kinesis Firehose. Order Data Stream can be stopped using Stop Order Data Stream button. </br>
+                            
+                            3. Streamed Orders are:</br>
+                              a)Cleaned and analyzed data results which are published to Elasticsearch Service.</br>
+                              b)Persisted in S3 RAW Bucket.</br>
+                              c)Validated and Loaded to Redshift (Via Glue ETL)</br></br>
+
+                              <strong class="example">c. Checking of Kinesis Analytics Application</strong></br></br>
+    
+                              1. Visit the Kinesis Analytics in AWS Management Console.</br>
+                              2. Check whether the application is running state if not wait for application to be in running state then proceed.<br/><br/>
+
+                                <strong class="example">d. Observe Real-time Kibana Dashboards with results of Analytics</strong>
+    
+                                1. Data will be available in Elasticsearch after few minutes.</br>
+                                2. Visit Streaming Order Data analysis dashboards in kibana.</br>
+                                3. Observe real-time Dashboards including :</br></br>
+                                <strong class="example">Age Group Wise Revenue</strong> </br></br>
+    
+                                  This dashboard shows total revenue for orders grouped by age groups computed in a sliding 1 minute window. </br>
+                                  <img src="../../static/diagrams/step4_1.png" class="stepper-image"/><br/><br/>
+                                  
+                                    <strong class="example">Top Selling Products</strong></br>
+    
+                                    This dashboard ranks the most popular product-Id computed in a sliding 1 minute window.</br>
+                                    <img src="../../static/diagrams/step4_2.png" class="stepper-image"/></br></br>
+                                    <strong>Kibana URL: </strong><br/><a href="{{kibanaUrl}}"><h6>{{kibanaUrl}}</h6></a>
+                                    <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Stop Order Data Stream" to stop data generation</div></br>
+                          <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
+                          <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="enableStartStream">Stop Order Data Stream</button>
+                          <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
+                          <button class="btn btn-primary" ng-click="nextStep('outer', 4)" ng-disabled="enableStreamNext">Next</button>
+                          <br/><br/>
+                          <div class="alert alert-info" ng-if="appStarted" style="width:fit-content"> <strong>{{appStarted}}</strong></div>
+                          
+                          </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Incremental data" md-complete="step5.completed" ng-disabled="stepper.step5">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 5:</strong>Incremental data<br/><br/>
+                    Incremental load is defined as the activity of loading new or updated columns in the table.
+                    AWS Glue detects schema changes in the data and adapts it.
+                    Till  now we were not having the e-mail address of the customers in the Customer data. Now we add the column in the customer table holding the email address of the customers. 
+                    This is because email consistently out performs other marketing activities. Actually, email  converts at nearly twice the normal in our experience – partly because they are regular and satisfied customers. Its certainly a lot cheaper than many of the activities retailers pursue.</br></br>
+
+                    Email is a critical piece of the marketing puzzle for e-Commerce businesses that can increase e-Commerce Conversions by Using Customer Data </br></br>
+
+                      <strong class="example">1. Using Past Online Purchases :</strong> Customers past behaviour is a good indicator of future behaviour. Past purchases inform you about the styles, brands, and products your customers are interested in. Sending the mail to the customer for the products based on customer interests can help in the increase of your business.</br></br>
+                      
+                      <strong class="example">2. Products Viewed :</strong> Viewing a product, especially multiple times, indicates interest. But, this data often goes unused in e-Commerce email marketing. Ideal use of this data is like : </br></br>
+                        1. After someone views a product but does not purchase it, send an email containing a buying guide to educate the potential customer about the item and provide the tools to evaluate it.</br></br>
+                        2. If the customer clicks on the buying guide, send a follow-up email to suggest urgency; for instance, a notification of a sale or limited inventory.</br></br>
+                      
+                      <strong class="example">3. Item left in Cart :</strong> Abandoned cart reminders probably are the most common way e-Commerce marketers use data to drive their email marketing programs. Limited inventory, a discount, and telling the customer you will remove the items from his cart soon are all ways to invoke sense of urgency. </br></br>
+                      
+
+                    <button class="btn btn-primary step-btn" ng-click="nextStep('outer', 5)" ng-disabled="btn1">Next</button>
+                    </div>
+                  </md-content>
+                </md-step>
+                <md-step label="ElasticSearch " md-complete="step6.completed" ng-disabled="stepper.step6">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 6: </strong>ElasticSearch<br/><br/>
+                    Yash Data Lake leverages Amazon Elasticsearch Service for data governance over e-commerce Raw dataset, Transformed Dataset and Enriched Dataset
+                    All the metadata relevant to data in data lake are indexed and available in the ElasticSearch Service dashboard.</br></br>
+                      <strong class="example">a) Demonstrate data governance</strong></br>
+                        The diagram below illustrates how the availability of new data S3 triggers the events, which trigger the Lambda functions to index data in the Elastic Search service.</br></br>
+                         <strong class="example"> b) Visualize the data indexed :</strong></br> When you click on Visit Elastic Search UI button, the following steps will be performed in your account</br>
+                          <div>a. Metadata of objects in S3 Buckets are indexed in the Elastic Search Service : </br>
+                            i. Raw Bucket</br>
+                            ii. Transformed Bucket</br>
+                            iii. Published Bucket</br>
+                            </div>
+     
+        
+
+
+
+                    <button class="btn btn-primary step-btn">Visit Elasticsearch UI</button>
+                    <button class="btn btn-primary" ng-click="nextStep('outer', 6)" ng-disabled="btn1">Next</button>
+                    </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Redshift Spectrum" md-complete="step7.completed" ng-disabled="stepper.step7">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 7: </strong>Redshift Spectrum
+                    <md-steppers md-selected="subRedshift" md-stretch-steppers="always" style="min-height: 100%;">
+                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="redshiftStepper.stepA">
+                              <md-content>
+                              Yash Data Lake leverages Amazon Redshift and Amazon Redshift Spectrum capabilities to transform, aggregate and analyse Transformed Datasets. Redshift Spectrum allows data to be analysed directly from S3,  thus it can scale to support querying exabytes of data.</br></br>
+                                <strong class="example">a) Using Redshift Spectrum for queries</strong><br/>
+                                 The diagram below illustrates how E-commerce is being merged with the Data that resides in S3 and Redshift.</br></br>
+
+                                  Transformed Dataset in S3 and Transformed Dataset in Redshift can be transformed, joined, analysed using Redshift Spectrum.</br></br>
+                                 
+                                 <strong class="example"> b) Demonstrate Spectrum analytics</strong></br></br>
+                                 <div class="padding-all">
+                                 <strong class="example">Payment type Distribution </strong>  <br/>
+                                  The exponential growth of cross-border e-commerce has precipitated the rise of (alternative) payment methods. There is an endless number of payment methods. To know what customers are preferring will help us to provide more options in that category.</br></br>
+                                  
+                                  <strong class="example">Age and Gender wise expenditure distribution</strong> </br></br>
+                                  
+                                  Understanding your audience composition in terms of gender and age lets you understand the kinds of creative content you need to develop, the kinds of media buys you should make, and the kinds of audiences you need to develop for marketing and remarketing campaigns.</br></br>
+                                  
+                                  <strong class="example">Order by state</strong> </br></br>
+                                  
+                                  Order distribution by state will give the insights about which state we are getting high order. So that we can target that states.<br/><br/>
+                                  
+                                  <strong class="example">Gender wise Product Category Distribution</strong></br></br>
+                                  
+                                  Understanding gender and it interests composition will let us understand the target audience for the specific product category.</br></br>
+                                    1. Target high-value users</br>
+                                    2. Eliminate ad spend on low-value users</br>
+                                    3. Refine remarketing audiences</br></br>
+                                  
+                                 <strong class="example"> Day of the Week</strong> </br>
+                                  
+                                  Segmenting by the day of the week is another beneficial report. Let’s revisit our ecommerce site. In the graphic , Saturday has the highest conversion rate, while Wednesday has the lowest. This could be because visitors are placing orders on their weekend activities. Or, it may be because the merchant sends his email and runs his weekly web specials on Saturday. It helps us track where visitors are coming from and see why conversion rates are what they are, and then amplify the successes.<br/><br/>
+                                  
+                                  <strong class="example">Top 10 Big Spenders</strong><br/><br/>
+                                  
+                                  One of your most important customer groups to be targeting is the group that consistently spends above others amount. Deciphering who your “big spenders” are is critical for a number of reasons.<br/><br/>
+                                    1. This group is generally a good bet for converting over general customers.<br/>
+                                    2. They’re a group that can often be trusted to respond well to changes or experiments by your marketing team.<br/><br/>
+                                    </div>
+                                    <strong class="example">c) Run Analytics using Amazon Redshift Spectrum</strong>
+                                    <div class="padding-all">
+                                        When you click on Run Analytics with Spectrum button the following steps will be performed within your AWS account<br/>
+                                          § Order, Customer and Demographics Transformed data are consumed by the analytics process.  AWS Glue Job will execute that will run the analytics queries for data Insights on these datasets.<br/>
+                                          § New transformed Datasets are created and added to the Data lake : <br/><br/>
+                                            □ Payment type Distribution<br/>
+                                            □ Age and Gender wise expenditure distribution<br/>
+                                            □ Order by state<br/>
+                                            □ Gender wise Product Category Distribution<br/>
+                                            □ Day of the Week<br/>
+                                            □ Top 10 Big Spenders<br/>
+
+                                    AWS Glue Crawler will discover the metadata for the table generated from the queries.
+                                    </div>
+
+                                 <button class="btn btn-primary step-btn" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                              </md-content>
+                            </md-step>
+                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="redshiftStepper.stepB">
+                              <md-content>
+                              Observe analytics output stored as Transformed Dataset in S3.
+                              <div class="padding-all">
+                              a. AWS Glue Job will transfer the Data stored in Redshift Transformed table to the Transformed Bucket in S3.<br/>
+                              b. Visit the AWS Management Console to see Spectrum analytics outputs stored as new datasets in Transformed bucket.</div><br/>
+
+                                <button
+                                 class="btn btn-primary step-btn" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
+                                &nbsp;&nbsp;<button class="btn btn-primary" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                              </md-content>
+                            </md-step>
+                          </md-steppers>
+                      </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Athena" md-complete="step8.completed" ng-disabled="stepper.step8">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 8: </strong>Athena<br/><br/>
+                    Yash Data Lake leverages Amazon Athena for Data Exploration and  Ad-hoc  analysis.</br>
+
+                    The diagram given below depicts the use of Athena Service to query S3 directly.</br></br>
+                      <strong class="example">a) Visit the Amazon Athena Console</strong></br> 
+                      a. When you click on Amazon Athena button, it will take you to the Amazon Athena Console where you can directly write the queries required for the analysis.</br>
+                      <a href="{{athenaLink}}" target="_blank"><button class="btn btn-primary">Amazon Athena</button></a> </br></br>
+    
+                       <strong class="example">b) Run Athena Queries</strong></br></br>
+                      a. In Amazon Athena Console to write queries. First, Select the athena_yash_db Database in the dropdown menu.</br> 
+
+    
+                        <strong class="example">Example 1 :  Hour Of The Day</strong></br> 
+                        This query will help business user to identify the peak hours of the day and helps in understanding the customer purchasing behaviour.</br> </br>
+                        
+                        <div class="query">SELECT HOUR(updt_date.order_date) as hour_of_day, count(*) as count </br>
+                        FROM (select cast(order_date as timestamp) as order_date from orders) updt_date </br>
+                        GROUP BY HOUR(updt_date.order_date) </br>
+                        ORDER BY HOUR(updt_date.order_date) asc;</div>
+                        
+                        Copy and paste queries in Athena and click  "Run Query".
+                        Make sure that athena_yash_db Database is selected prior to running query.</br> </br> 
+                        
+                        <strong class="example">Example 2 : Expenditure distribution on the bases of Marital status</strong></br> 
+                        Lets see averages revenue across different customer segments based on their marital status.</br> </br>
+                        
+                         <div class="query">SELECT c.marital_status,
+                             cast((sum(o.amount_spent)/1000) as double) as expenditure_1000 </br>
+                        FROM customers c </br>
+                        JOIN orders o </br>
+                          ON c.customer_id = o.customer_id </br>
+                        GROUP BY c.marital_status;</div></br> </br> 
+                        
+                        <strong class="example">Example 3 :  Product Category wise Order Distribution</strong> </br>
+                        Let us see how orders are distributed among different product categories.</br></br>
+                        
+                         <div class="query">SELECT products.product_category as ProductCategory, count(*) as count </br>
+                        FROM products  </br>
+                        JOIN orders </br>
+                          ON orders.sku = products.sku </br>
+                        GROUP BY products.product_category;</div></br> </br> 
+
+
+                    <button class="btn btn-primary step-btn">Register Tables in Athena For Ad-Hoc Analysis</button>
+                    &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
+                    </div>
+                  </md-content>
+                </md-step>
+                <md-step label="QuickSight" md-complete="step9.completed" ng-disabled="stepper.step9">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 9: </strong>QuickSight<br/><br/>
+                 
+
+                     <md-steppers md-selected="subQuickSight" md-stretch-steppers="always" style="min-height: 100%;">
+                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="quickSightStepper.stepA">
+                              <md-content>
+                              Yash Data Lake leverages AWS QuickSight to build visualizations, perform ad hoc analysis, and quickly get business insights from Enriched Data. QuickSight presents data stories that are relevant to business users.</br></br>
+
+                              <strong class="example">Publish Data to Published Data S3 Bucket</strong></br></br>
+                                  a. When you click on the Publish Data button, the following steps will be performed within your AWS account.
+                                  <div class="padding-all">i. AWS Glue Crawler discovers Transformed Dataset and AWS Glue Job copies from Transformed Dataset to Published Data S3 Bucket.<br/>
+                                  ii. AWS Glue Crawler create metadata for Published Dataset.</div></br></br>
+      
+
+                                 <button class="btn btn-primary step-btn" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
+                                 <button class="btn btn-primary" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
+                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                              </md-content>
+                            </md-step>
+                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="quickSightStepper.stepB">
+                              <md-content>
+                               <strong>Create visualisation</strong>
+                               The Diagram illustrate QuickSight Dashboards, which tell compelling data stories to the business users.</br></br>
+                              <div class="row">
+                                 <div class="col-md-12">
+                                    <div class="col-md-6">
+                                    <img src="../../static/diagrams/step10_1.png" class="stepper-image"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                    <img src="../../static/diagrams/step10_7.png" class="stepper-image"/>
+                                    </div>
+                                 </div>
+                              </div>
+                              </br></br>
+                              <div class="row">
+                                 <div class="col-md-12">
+                                    <div class="col-md-6">
+                                    <img src="../../static/diagrams/step10_3.png" class="stepper-image"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                    <img src="../../static/diagrams/step10_4.png" class="stepper-image"/>
+                                    </div>
+                                 </div>
+                              </div>
+                              </br></br>
+                              <div class="row">
+                                 <div class="col-md-12">
+                                    <div class="col-md-6">
+                                    <img src="../../static/diagrams/step10_5.png" class="stepper-image"/>
+                                    </div>
+                                    <div class="col-md-6">
+                                   <img src="../../static/diagrams/step10_6.png" class="stepper-image"/>
+                                    </div>
+                                 </div>
+                              </div>
+                              </br></br>
+                              </br>
+                             <div class="padding-all"> a. In order to develop QuickSight Dashboards, you will need to create a QuickSight account (which is different from your AWS IAM account). Please follow the instructions given on the following URL : https://docs.aws.amazon.com/quicksight/latest/user/request-access.html</br>
+                              b. Allow QuickSight to access the Published Dataset Bucket through the QuickSight UI.</br>
+                              c. Follow the steps described below to create the following dashboards.</div></br>
+                               <div class="bd-example">
+                      <div id="accordion" role="tablist">
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingOne">
+                            <h5 class="mb-0">
+                              <a data-toggle="collapse" href="#collapseOne" role="button" aria-expanded="true" aria-controls="collapseOne">
+                                Payment mode Distribution
+                              </a>
+                            </h5>
+                          </div>
+
+                          <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                            <div style="padding:2%;">
+                             Payment mode distribution dataset consists of records with columns : payment_mode, number_of_orders</br>
+                              Use the following procedure to create the visualisation from it:</div>
+                                <div class="padding-all">1. Create Pie chart visual with the payment_mode as Value and number_of_orders
+                                as Color.</br>
+                                2. The Result will look like this :</div></br>
+                                <img src="../../static/diagrams/step10_1.png" class="stepper-image"/>
+
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingTwo">
+                            <h5 class="mb-0">
+                              <a class="collapsed" data-toggle="collapse" href="#collapseTwo" role="button" aria-expanded="false" aria-controls="collapseTwo">
+                                Age and Gender wise expenditure distribution
+                              </a>
+                            </h5>
+                          </div>
+                          <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">
+                            <div style="padding:2%;">
+                              Age and Gender wise expenditure distribution dataset consists of records with columns : customer_id, gender, age_grp_category, expenditure</br>
+                              Use the following procedure to create the visualisation from it:
+                              </div>
+                              <div class="padding-all">1. Create Vertical Bar Chart visual with expenditure as value and age_ grp_category on X-axis and gender as color</br>
+                                2. Change aggregation method from SUM to AVERAGE on the expenditure column.</br>
+                                3. The Result will look like this :</div></br></br>
+                                <img src="../../static/diagrams/step10_7.png" class="stepper-image"/></br>
+
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingThree">
+                            <h5 class="mb-0">
+                              <a class="collapsed" data-toggle="collapse" href="#collapseThree" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                Order Distribution by Day of Week
+                              </a>
+                            </h5>
+                          </div>
+                          <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                            <div style="padding:2%;">
+                              Day of Week dataset consists of records with columns : day_of_week, order_distribution</br>
+
+                              Use the following procedure to create the visualisation from it:
+                              </div></br>
+                              <div class="padding-all">
+                                1. Create Cluster Bar Combo Chart visual with  day_of_week as X axis and </br>
+                                order_distribution as Bars and Lines.</br>
+                                2. The Result will look like this :</div></br></br>
+                                <img src="../../static/diagrams/step10_3.png" class="stepper-image"/></br>
+                            </div>
+                          </div>
+                        </div>
+                         <div class="card">
+                          <div class="card-header" role="tab" id="headingThree">
+                            <h5 class="mb-0">
+                              <a class="collapsed" data-toggle="collapse" href="#collapseFour" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                Top 10 Big Spenders
+                              </a>
+                            </h5>
+                          </div>
+                          <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                            <div style="padding:2%;">
+                              Big Spenders dataset consists of records with columns : customer_name, total_amt_spent, number_of_orders</br>
+
+                              Use the following procedure to create the visualisation from it:</br></div>
+                                <div class="padding-all">1. Create Table visual with  customer_name as Group by and 
+                                total_amt_spent as Value.</br>
+                                2. Use Sort to arrange the total_amt_spent in decreasing order.</br>
+                                3. The Result will look like this :</div></br>
+                              </br></br>
+                                <img src="../../static/diagrams/step10_6.png" class="stepper-image"/></br>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingThree">
+                            <h5 class="mb-0">
+                              <a class="collapsed" data-toggle="collapse" href="#collapseFive" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                Product category distribution
+                              </a>
+                            </h5>
+                          </div>
+                          <div id="collapseFive" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                            <div style="padding:2%;">
+                              Product category dataset consists of records with columns : product_category, gender, 
+                              number_of_orders</br>
+
+                              Use the following procedure to create the visualisation from it:</br></div>
+                                <div class="padding-all">1. Create Horizontal Bar Chart visual with number_of_orders as value and 
+                                product_category on Y-axis and gender as Color</br>
+                                2. Use aggregation method SUM on the number_of_orders column.</br>
+                                3. The Result will look like this :</div></br></br>
+                                <img src="../../static/diagrams/step10_4.png" class="stepper-image"/></br>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card">
+                          <div class="card-header" role="tab" id="headingThree">
+                            <h5 class="mb-0">
+                              <a class="collapsed" data-toggle="collapse" href="#collapseSix" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                State wise Order distribution
+                              </a>
+                            </h5>
+                          </div>
+                          <div id="collapseSix" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                            <div style="padding:2%;">
+                              State wise order distribution dataset consists of records with columns : state, gender, 
+                              number_of_orders</br>
+
+                              Use the following procedure to create the visualisation from it:</br></div>
+                               <div class="padding-all"> 1. Create Vertical Stacked Bar Chart visual with number_of_orders as value and 
+                                state on X-axis and gender as color</br>
+                                2. Use aggregation method SUM on the number_of_orders column.</br>
+                                3. The Result will look like this :</div></br>
+
+                                <img src="../../static/diagrams/step10_5.png" class="stepper-image"/></br></br>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                                <button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button>
+                                &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
+                              </md-content>
+                            </md-step>
+                          </md-steppers>
+                          </div>
+                  </md-content>
+                </md-step>
+                <md-step label="Learn More" md-complete="step10.completed" ng-disabled="stepper.step10">
+                  <md-content>
+                  <div class="step-content">
+                    <strong> Step 10: </strong>Learn More<br/><br/>
+                    Congratulations, you have completed the Yash Data Lake walk-through!<br/><br/>
+
+                    During this Quick Start, we have demonstrated best practices for get-started data lake in AWS.<br/><br/>
+                     
+                    Some customers can have additional requirements to customize their data lake using their own data and analytics use cases for that please reach out to our team via  email on InnovationGroup@yash.com or using the form given below :<br/><br/>
+
+                    Your Name (Required)<br/><br/>
+                     
+                    Your Email Id (Required)<br/><br/>
+
+                    Role<br/><br/>
+
+                    Company<br/><br/>
+
+                    Targeted Use Case<br/><br/>
+
+                    <button class="btn btn-primary">Submit</button><br/><br/>
+
+
+                    About Yash<br/><br/>
+                     <strong>YASH</strong> is a well-regarded, global  IT service provider, with customers in a number of industries. YASH provides a comprehensive portfolio of services and solutions that not only solve today’s IT challenges, but also address tomorrow’s business priorities. As a strategic premier application and infrastructure outsourcing services provider, YASH enables our customers to maximize the value of their IT investments, while helping them optimize their IT expenses for sustained business value.<br/><br/>
+
+                    </div>
+                  </md-content>
+                </md-step>
+              </md-steppers>
+            </md-card>
+          </div>
+          <div ng-if="show.loader">
+            <div class="loader"></div>
+          </div>
+        </div>
+      </section>
+      <footer class="container text-center" style="position: unset"> Developed By : Innovation Group , Yash Technologies Pvt Ltd </footer>
+</body>
+
+</html>
