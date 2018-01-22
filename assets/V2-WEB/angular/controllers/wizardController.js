@@ -825,6 +825,9 @@ $scope.stopKinesisApp = function() {
                         console.error(refreshErr);
                     }
                     else {
+                      obj = {
+                        [userPoolProviderName]: localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken")
+                      };
                       console.log("inside AWS.config.credentials in refresh");
                   AWS.config.credentials.refresh((error) => {
               if (error) {
