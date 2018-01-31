@@ -847,7 +847,7 @@ $scope.stopKinesisApp = function() {
             }
        });
   }
-  //$scope.resfresh = $interval($scope.refreshToken, 900000);
+  $scope.resfresh = $interval($scope.refreshToken, 900000);
 });
 
 
