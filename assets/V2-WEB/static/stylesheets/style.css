@@ -133,7 +133,11 @@ a {
      margin-top: 5%;
    }
    .step-btn {
-     margin-left: 38%
+     margin-left: 38%;
+     margin-bottom: 100px;
+   }
+   .content {
+      margin-bottom: 100px;
    }
 /*for stepper beautify*/
 .md-step::before { width : 0px !important;}
@@ -143,7 +147,7 @@ a {
 .md-step md-step-label-wrapper { text-align: center !important;}
 .stepper-image {
   width: 100%;
-  height: 70%;
+  height: 100%;
 }
 
 .query {
@@ -206,4 +210,7 @@ _component-examples.scss:108
     margin: 1rem -15px;
     border: solid #f7f7f9;
     border-width: .2rem 0 0;
+}
+#step-content-13, #step-content-15 {
+  overflow: auto !important;
 }
