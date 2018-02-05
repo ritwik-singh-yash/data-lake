@@ -41,6 +41,7 @@ md-steppers {
     position: relative;
     overflow: inherit !important;
   }
+  
 
 </style>
 <!DOCTYPE html>
@@ -121,6 +122,31 @@ md-steppers {
    <script src="../../static/js/sku.js" type="text/javascript"></script>
    <script src="../../static/js/customer_id.js" type="text/javascript"></script>
    <script src="../../static/js/faker.js" type="text/javascript"></script>
+
+   <script type="text/javascript">
+      $(document).ready(function(){
+
+            $( "md-pagination-wrapper .md-ink-ripple" ).each(function( index, elem ) {
+
+             var txtLabel = $(elem).find('span').text();
+             var indexPosition = txtLabel.indexOf("Step");
+              if(indexPosition>-1) {
+                var last_character = txtLabel[txtLabel.length-1];
+                $(elem).find('span').remove();
+                  let customHeading = '<div><div class="headingCircle">'+last_character+'</div><div style="text-transform: capitalize;">'+txtLabel+'</div></div>';
+                  $(elem).append(customHeading)
+              } else {
+                  $(elem).find('span').remove();
+                  let customHeading = '<div><div class="headingCircle">'+(index+1)+'</div><div style="text-transform: capitalize;">'+txtLabel+'</div></div>';
+                  $(elem).append(customHeading)
+                }
+                
+            });
+      })
+   </script>
+
+
+
    </head>
 
   <body>
@@ -146,235 +172,307 @@ md-steppers {
       <section id="contact" style="margin-top:0%">
         <div class="row" ng-app="myApp" ng-controller="wizardController">
           <div class="col-lg-12 mx-auto">
-            <md-card ng-init="step2.disabled = true; step3.disabled = true;step4.disabled = true;step5.disabled = true;step6.disabled = true;step7.disabled = true;step8.disabled = true;" style="height: 100%">
-              <md-steppers md-selected="selected" md-stretch-steppers="always" class="stretched" md-linear="true" style="height: 100%">
-                <md-step label="Get Started" md-complete="step1.completed" ng-disabled="stepper.step1" style="text-align: center">
-                  <md-content>
+            <div ng-cloak>
+          <md-content>
+            <md-tabs md-dynamic-height md-border-bottom  ng-init="step2.disabled = true; step3.disabled = true;step4.disabled = true;step5.disabled = true;step6.disabled = true;step7.disabled = true;step8.disabled = true;" md-selected="selected">
+              <md-tab label="Get Started" ng-disabled="stepper.step1">
+                <md-content class="md-padding">
                   <div class="step-content">
-                    <strong>
-                    Step 1: 
-                    </strong>Get Started
-                    <div class="stepper-content">
-                    Yash Data lake Walk through guide is build to assist you through the Server less Data Lake reference architecture and the AWS services used within.</br>
-
-                    To demonstrate the flow in AWS Account, We are going to use a sample dataset of the Ecommerce company that sell its products at XYZ.com. </br></br>
-
-                    E-commerce is growing rapidly, but with the huge market acting as a magnet to brands large and small, competition is ramping up faster than the total growth of the market. This means customers are harder to win, easier to lose and fussier on price and user experience. To avoid falling behind the ever more fierce competition, you need to both be aware of and benefit from the latest trends in e-commerce.</br></br>
-
-                    Thus e-commerce insights like Customer segmentation (which is referred as the process of using customer data to enable a clustering of customers with shared attributes) which can be used to communicate different things to different groups and Lifetime value of the customer can help business user to understand the trend.</br></br>
-
-                    Yash Data Lake in AWS provides data ingestion, real-time analytics over continuous stream of data, batch analytics using the data available in the Data Lake, ad-hoc analytics for exploring different data insights and visualisation, which can be easily understood by key stakeholders. </br></br>
-
-
-                    The architecture diagram given below provides a high-level overview of Yash Data Lake in AWS. All of the AWS resources illustrated below were deployed to your account when you launched the Yash Data lake. As we step through this guide, sample data from E-commerce will be ingested into your account using cloud formation. After this demonstration, you can remove the data and start using Yash Data lake architecture with your own data.</br></br>
-                    <img src="../../static/diagrams/getting-started.png" class="stepper-image"/><br/><br/>
-                   <button class="btn btn-primary step-btn" ng-click="createProp()">Begin walk-through</button>
-                   </div>
-                   </div>
-                  </md-content>
-                </md-step>
-                <md-step label="Discover RAW Datasets" md-complete="step2.completed" ng-disabled="stepper.step2">
-                  <md-content>
+                   <h5 class="md-display-0"> Step 1: Get Started</h5>
+                    <div class="div-content">
+                      Yash Data lake Walk through guide is build to assist you through the Server less Data Lake reference architecture and the AWS services used within.
+                      
+                      To demonstrate the flow in AWS Account, We are going to use a sample dataset of the Ecommerce company that sell its products at XYZ.com. 
+                    </div>
+                    <div class="div-content">
+                      E-commerce is growing rapidly, but with the huge market acting as a magnet to brands large and small, competition is ramping up faster than the total growth of the market. This means customers are harder to win, easier to lose and fussier on price and user experience. To avoid falling behind the ever more fierce competition, you need to both be aware of and benefit from the latest trends in e-commerce.
+                    </div>
+                    <div class="div-content">
+                      Thus e-commerce insights like Customer segmentation (which is referred as the process of using customer data to enable a clustering of customers with shared attributes) which can be used to communicate different things to different groups and Lifetime value of the customer can help business user to understand the trend.
+                    </div>
+                    <div class="div-content">
+                      Yash Data Lake in AWS provides data ingestion, real-time analytics over continuous stream of data, batch analytics using the data available in the Data Lake, ad-hoc analytics for exploring different data insights and visualisation, which can be easily understood by key stakeholders.
+                    </div>
+                    <div class="div-content">
+                      The architecture diagram given below provides a high-level overview of Yash Data Lake in AWS. All of the AWS resources illustrated below were deployed to your account when you launched the Yash Data lake. As we step through this guide, sample data from E-commerce will be ingested into your account using cloud formation. After this demonstration, you can remove the data and start using Yash Data lake architecture with your own data.
+                    </div>
+                    <div class="div-content">
+                      <img src="../../static/diagrams/getting-started.png" class="stepper-image"/>
+                    </div>
+                    <button class="btn btn-primary step-btn" ng-click="createProp()">Begin walk-through</button>
+                  </div>
+                </md-content>
+              </md-tab>
+              <md-tab label="Discover RAW Datasets" ng-disabled="stepper.step2">
+                <md-content class="md-padding">
                   <div class="step-content">
-                  <strong>
-                    Step 2: 
-                    </strong class="example">Discover RAW Datasets
-                     <div class="stepper-content"> 
-                     Yash Data Lake leverage Amazon S3, Amazon Glue, Amazon Redshift for data management and transformation of the data provided by the Customer.</br></br>
-
-                      AWS Glue is a fully managed extract, transform, and load (ETL) service. Glue crawlers can scan data lake and keep the Glue Data Catalog in sync with the underlying data. </br></br>
-                      Principles of Data Organisation within Yash Data lake</br></br>
-
-                        Raw datasets are stored to the Data Lake in their native format to keep the raw data intact. This enhance business users to transform dataset as per their needs and also the cost of entry remains low. </br></br>
-
-                      AWS Glue Crawler discovers Raw datasets and populates the metadata (e.g. table definition and schema) associated with it in the AWS Glue Data Catalog.</br></br>
-                        
-
-                      The AWS Glue database gets populated with four tables named Orders, Customers, Products & Demographics.<br/><br/>
-                      <strong class="example">Review Dataset contributed by Data Provider</strong><br/>
-                       <img src="../../static/diagrams/QuickStart_Step2.png" class="stepper-image"/><br/>
-                     <br/><button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary content" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
+                  <h5 class="md-display-0">Step2: Discover RAW Datasets</h5>
+                    <div class="div-content"> 
+                      Yash Data Lake leverage Amazon S3, Amazon Glue, Amazon Redshift for data management and transformation of the data provided by the Customer.
+                    </div>
+                     <div class="div-content">
+                      AWS Glue is a fully managed extract, transform, and load (ETL) service. Glue crawlers can scan data lake and keep the Glue Data Catalog in sync with the underlying data.
+                    </div>
+                    <div class="div-content"> 
+                      Principles of Data Organisation within Yash Data lake
+                    </div>  
+                    <div class="div-content padding-all">  
+                      Raw datasets are stored to the Data Lake in their native format to keep the raw data intact. This enhance business users to transform dataset as per their needs and also the cost of entry remains low. 
+                    </div>  
+                    <div class="div-content">
+                      AWS Glue Crawler discovers Raw datasets and populates the metadata (e.g. table definition and schema) associated with it in the AWS Glue Data Catalog.
+                    </div>
+                    <div class="div-content">
+                      The AWS Glue database gets populated with four tables named Orders, Customers, Products & Demographics.
+                    </div>
+                    <div class="div-content">
+                    <strong class="example">Review Dataset contributed by Data Provider</strong>
+                    </div>
+                    <div class="div-content">
+                       <img src="../../static/diagrams/QuickStart_Step2.png" class="stepper-image"/></div>
+                    <button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
                             <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
+                </md-content>
+              </md-tab>
+              <md-tab label="Create Transformed Datasets" ng-disabled="stepper.step3">
+                <md-content class="md-padding">
+                  <h5 class="md-display-0">Step 3: Create Transformed Datasets</h5>
+                  <md-tabs id="innerTabCustom" md-dynamic-height md-border-bottom  ng-init="subSelected = 0;" md-selected="subSelected">
+                    <md-tab label="Step A" ng-disabled="subStepper.stepA">
+                      <md-content style="overflow:hidden;">
+                        <div class="row">
+                          <div class="col-md-12 padding-all">
+                             <div class="div-content">
+                            <strong class="example">Creation of Transformed Datasets </strong>
+                            </div>
+                             <div class="div-content">
+                            AWS Glue creates four ETL Jobs for the creation of Transformed dataset and writes it in S3 Bucket named TRANSFORMED_BUCKET_DB partition by year, month & day.
+                            </div>
+                            <div class="div-content">
+                              <img src="../../static/diagrams/quickstart_step3a.png" class="stepper-image"/>
+                            </div>
+                            <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
+                           <br/><br/>
+                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                           </div>
+                       </div>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="Step B" ng-disabled="subStepper.stepB">
+                      <md-content style="overflow:hidden;">
+                        <div class="col-md-12 padding-all">
+                         <div class="div-content"> 
+                         <strong class="example">Discover Transformed Datasets</strong>
+                         </div>
+                         <div class="div-content"> 
+                          AWS Glue Crawler discovers Transformed data and catalogs metadata about your data stores into a central catalog.
                           </div>
-                  </md-content>
-                </md-step>
-                <md-step label="Create Transformed Datasets" md-complete="step3.completed" ng-disabled="stepper.step3">
-                  <md-content style="overflow: inherit;">
-                    <div class="step-content">
-                      <strong> Step 3:</strong>Create Transformed Datasets
-
-                      <md-card ng-init="subSelected = 0;">
-                        <md-steppers md-selected="subSelected" class="stretched" md-stretch-steppers="always" md-linear="true">
-                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="subStepper.stepA">
-                              <md-content style="overflow:hidden;">
+                          <div class="div-content"> 
+                           <img src="../../static/diagrams/quickstart_Step3b.png" class="stepper-image"/>
+                           </div>
+                          <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/>
+                          <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                          </div>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="Step C" ng-disabled="subStepper.stepC">
+                      <md-content style="overflow:hidden;">
+                        <div class="col-md-12 padding-all">
+                          <div class="div-content"> 
+                            <strong class="example">Load and Register Transformed Dataset within Redshift</strong>
+                          </div>
+                            <div class="div-content"> 
                               <div class="row">
-                              <div class="col-md-12 padding-all">
-                              <strong class="example">Creation of Transformed Datasets </strong></br>
-                                  AWS Glue creates four ETL Jobs for the creation of Transformed dataset and writes it in S3 Bucket named TRANSFORMED_BUCKET_DB partition by year, month & day.
-                                  </div>
-                                  <br/>
-                                  <img src="../../static/diagrams/quickstart_step3a.png" class="stepper-image"/><br/> <br/>
-                                 <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary content" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
-                                 <br/><br/>
-                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
-                                 </div>
-                                 
-                              </md-content>
-                            </md-step>
-                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="subStepper.stepB">
-                              <md-content style="overflow:hidden;">
-                              <div class="col-md-12 padding-all">
-                               <strong class="example">Discover Transformed Datasets</strong></br></br>
-                                AWS Glue Crawler discovers Transformed data and catalogs metadata about your data stores into a central catalog.
+                                1. AWS Glue ETL Jobs Load Transformed Dataset to Redshift Tables.</br>
+                                <div class="padding-all">a) Orders dataset to Orders Table</br>
+                                  b) Customers dataset to Customers Table</br>
                                 </div>
-                                 <br/>
-                                 <img src="../../static/diagrams/quickstart_Step3b.png" class="stepper-image"/> <br/> <br/>
-                                <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary content" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/>
-                                <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
-                              </md-content>
-                            </md-step>
-                            <md-step label="Step C" md-complete="stepC.completed" ng-disabled="subStepper.stepC">
-                              <md-content style="overflow:hidden;">
-                                <div class="col-md-12 padding-all">
-                                  <strong class="example">Load and Register Transformed Dataset within Redshift</strong></br></br>
-                                  <div class="row">
-                                    1. AWS Glue ETL Jobs Load Transformed Dataset to Redshift Tables.</br>
-                                    <div class="padding-all">a) Orders dataset to Orders Table</br>
-                                      b) Customers dataset to Customers Table</br>
-                                    </div>
-                                  </div>
-                                  <div class="row">
-                                    2. Register Transformed Dataset as external tables in Redshift Spectrum:</br>
-                                    <div class="padding-all">a) Demographics</br>
-                                     b) Products
-                                    </div>
-                                  </div>
+                              </div>
+                            </div>
+                            <div class="div-content"> 
+                              <div class="row">
+                                2. Register Transformed Dataset as external tables in Redshift Spectrum:</br>
+                                <div class="padding-all">a) Demographics</br>
+                                  b) Products
                                 </div>
-                                 <img src="../../static/diagrams/quickstart_step3c.png" class="stepper-image"/> <br/> <br/>
-                                  <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary content" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/>
-                                  <div class="alert alert-info content" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
-                              </md-content>
-                            </md-step>
-                        </md-steppers>
-                      <md-card>
+                              </div>
+                            </div>
+                            <div class="div-content"> 
+                              <img src="../../static/diagrams/quickstart_step3c.png" class="stepper-image"/>
+                            </div>
+                          <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/>
+                          <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                          </div>
+                      </md-content>
+                    </md-tab>
+                  </md-tabs>
+                </md-content>
+              </md-tab>
+              <md-tab label="Streaming Data" ng-disabled="stepper.step4">
+                <md-content class="md-padding">
+                  <h5 class="md-display-0">Step 4: Streaming Data</h5>
+                  <div class="div-content">
+                     Yash Data lake leverages Amazon Kinesis for streaming data ingestion, validation and analytics with real-time dashboards in the ElasticSearch service.
+                   </div>
+                   <div class="div-content">  
+                     <strong class="example">a. Architecture for Streaming Data Submission</strong>
+                    </div> 
+                    <div class="div-content">
+                      This diagram illustrate how orders stream get ingested in the real-time by the kinesis firehose and stored in Redshift. Kinesis Analytics provides real-time analytics on orders data ,results of which are stored in ElasticSearch service that provides real-time dashboards on business relevant KPIs using Kibana
                     </div>
-                  </md-content>
-                </md-step>
-                <md-step label="Streaming Data" md-complete="step4.completed" ng-disabled="stepper.step4">
-                  <md-content>
-                  <div class="step-content">
-                    <strong> Step 4: </strong>Streaming Data<br/><br/>
-                          Yash Data lake leverages Amazon Kinesis for streaming data ingestion, validation and analytics with real-time dashboards in the ElasticSearch service.</br></br>
-                            <strong class="example">a. Architecture for Streaming Data Submission</strong></br>
+                    <div class="div-content">  
+                      <img src="../../static/diagrams/quickstart_step4.png" class="stepper-image"/>
+                    </div>
+                    <div class="div-content">
+                      <strong class="example">b. Streaming Data Creation and Analytics</strong>
+                    </div>
+                    <div class="div-content padding-all">
+                      1. Creates two Kinesis Analytics applications:</br>
+                        a) clean-order-app : This kinesis application will remove all the null values from the customerId column in Orders data.</br>
+                        
+                        b) aggregate-orders-app : This app provides real-time analytics on orders data.</br>
+                        
+                      2. On the click of Start Order Data Stream button Order Data gets generated via Javascript which streams Orders data into Kinesis Firehose. Order Data Stream can be stopped using Stop Order Data Stream button. </br>
+                      
+                      3. Streamed Orders are:</br>
+                        a)Cleaned and analyzed data results which are published to Elasticsearch Service.</br>
+                        b)Persisted in S3 RAW Bucket.</br>
+                        c)Validated and Loaded to Redshift (Via Glue ETL)</br></br>
+                    <div class="div-content">
+                        <strong class="example">c. Checking of Kinesis Analytics Application</strong>
+                     </div>   
+                      <div class="div-content">
+                        1. Visit the Kinesis Analytics in AWS Management Console.</br>
+                        2. Check whether the application is running state if not wait for application to be in running state then proceed.
+                        </div>
+                        <div class="div-content">
+                          <strong class="example">d. Observe Real-time Kibana Dashboards with results of Analytics</strong>
+                        </div>
+                        <div class="div-content">
+                          1. Data will be available in Elasticsearch after few minutes.</br>
+                          2. Visit Streaming Order Data analysis dashboards in kibana.</br>
+                          3. Observe real-time Dashboards including :
+                          </div>
+                          <div class="div-content">
+                          <strong class="example">Age Group Wise Revenue</strong>
+                          </div>
+                          <div class="div-content">
+                            This dashboard shows total revenue for orders grouped by age groups computed in a sliding 1 minute window.
+                          </div>
+                          <div class="div-content">
+                            <img src="../../static/diagrams/step4_1.png" class="stepper-image"/>
+                            </div>
+                              <strong class="example">Top Selling Products</strong></br>
 
-                            This diagram illustrate how orders stream get ingested in the real-time by the kinesis firehose and stored in Redshift. Kinesis Analytics provides real-time analytics on orders data ,results of which are stored in ElasticSearch service that provides real-time dashboards on business relevant KPIs using Kibana</br></br>
-                            <img src="../../static/diagrams/quickstart_step4.png" class="stepper-image"/>
-                            </br>
-
-                            <strong class="example">b. Streaming Data Creation and Analytics</strong></br></br>
-                          
-                            1. Creates two Kinesis Analytics applications:</br>
-                              a) clean-order-app : This kinesis application will remove all the null values from the customerId column in Orders data.</br>
-                              
-                              b) aggregate-orders-app : This app provides real-time analytics on orders data.</br>
-                              
-                            2. On the click of Start Order Data Stream button Order Data gets generated via Javascript which streams Orders data into Kinesis Firehose. Order Data Stream can be stopped using Stop Order Data Stream button. </br>
-                            
-                            3. Streamed Orders are:</br>
-                              a)Cleaned and analyzed data results which are published to Elasticsearch Service.</br>
-                              b)Persisted in S3 RAW Bucket.</br>
-                              c)Validated and Loaded to Redshift (Via Glue ETL)</br></br>
-
-                              <strong class="example">c. Checking of Kinesis Analytics Application</strong></br></br>
-    
-                              1. Visit the Kinesis Analytics in AWS Management Console.</br>
-                              2. Check whether the application is running state if not wait for application to be in running state then proceed.<br/><br/>
-
-                                <strong class="example">d. Observe Real-time Kibana Dashboards with results of Analytics</strong>
-    
-                                1. Data will be available in Elasticsearch after few minutes.</br>
-                                2. Visit Streaming Order Data analysis dashboards in kibana.</br>
-                                3. Observe real-time Dashboards including :</br></br>
-                                <strong class="example">Age Group Wise Revenue</strong> </br></br>
-    
-                                  This dashboard shows total revenue for orders grouped by age groups computed in a sliding 1 minute window. </br>
-                                  <img src="../../static/diagrams/step4_1.png" class="stepper-image"/><br/><br/>
-                                  
-                                    <strong class="example">Top Selling Products</strong></br>
-    
-                                    This dashboard ranks the most popular product-Id computed in a sliding 1 minute window.</br></br>
-                                    <img src="../../static/diagrams/step4_2.png" class="stepper-image"/></br></br>
-                                    <strong>Kibana URL: </strong><br/><a href="{{kibanaUrl}}"><h6>{{kibanaUrl}}</h6></a>
-                                    <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Stop Order Data Stream" to stop data generation</div></br>
-                          <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
-                          <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="enableStartStream">Stop Order Data Stream</button>
-                          <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
-                          <button class="btn btn-primary" ng-click="nextStep('outer', 4)" ng-disabled="enableStreamNext">Next</button>
-                          <br/><br/>
-                          <div class="alert alert-info" ng-if="appStarted" style="width:fit-content"> <strong>{{appStarted}}</strong></div>
+                              This dashboard ranks the most popular product-Id computed in a sliding 1 minute window.</br></br>
+                              <img src="../../static/diagrams/step4_2.png" class="stepper-image"/></br></br>
+                              <strong>Kibana URL: </strong><br/><a href="{{kibanaUrl}}"><h6>{{kibanaUrl}}</h6></a>
+                              <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Stop Order Data Stream" to stop data generation</div></br>
+                    <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
+                    <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="enableStartStream">Stop Order Data Stream</button>
+                    <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
+                    <button class="btn btn-primary" ng-click="nextStep('outer', 4)" ng-disabled="enableStreamNext">Next</button>
+                    <br/><br/>
+                    <div class="alert alert-info" ng-if="appStarted" style="width:fit-content"> <strong>{{appStarted}}</strong></div>
                           
                           </div>
-                  </md-content>
-                </md-step>
-                <md-step label="Incremental data" md-complete="step5.completed" ng-disabled="stepper.step5">
+                </md-content>
+              </md-tab>
+              <md-tab label="Incremental data" ng-disabled="stepper.step5">
+                <md-content class="md-padding">
                   <md-content>
+                    <div class="step-content">
+                    <h5 class="md-display-0">Step 5: Incremental data</h5>
+                    <div class="div-content">  
+                      Incremental load is defined as the activity of loading new or updated columns in the table.
+                      AWS Glue detects schema changes in the data and adapts it.
+                      Till  now we were not having the e-mail address of the customers in the Customer data. Now we add the column in the customer table holding the email address of the customers. 
+                      This is because email consistently out performs other marketing activities. Actually, email  converts at nearly twice the normal in our experience – partly because they are regular and satisfied customers. Its certainly a lot cheaper than many of the activities retailers pursue.
+                    </div>  
+                    <div class="div-content">  
+                      Email is a critical piece of the marketing puzzle for e-Commerce businesses that can increase e-Commerce Conversions by Using Customer Data
+                    </div>  
+                      <div class="div-content">  
+                        <strong class="example">1. Using Past Online Purchases :</strong> Customers past behaviour is a good indicator of future behaviour. Past purchases inform you about the styles, brands, and products your customers are interested in. Sending the mail to the customer for the products based on customer interests can help in the increase of your business.
+                      </div>  
+                      <div class="div-content">     
+                        <strong class="example">2. Products Viewed :</strong> Viewing a product, especially multiple times, indicates interest. But, this data often goes unused in e-Commerce email marketing. Ideal use of this data is like :
+                        </div>
+                        <div class="div-content">  
+                          1. After someone views a product but does not purchase it, send an email containing a buying guide to educate the potential customer about the item and provide the tools to evaluate it.</br></br>
+                          2. If the customer clicks on the buying guide, send a follow-up email to suggest urgency; for instance, a notification of a sale or limited inventory.
+                        </div>  
+                        <div class="div-content">  
+                        <strong class="example">3. Item left in Cart :</strong> Abandoned cart reminders probably are the most common way e-Commerce marketers use data to drive their email marketing programs. Limited inventory, a discount, and telling the customer you will remove the items from his cart soon are all ways to invoke sense of urgency.
+                        </div>
+                        <button class="btn btn-primary step-btn" ng-click="nextStep('outer', 5)" ng-disabled="btn1">Next</button>
+                      </div>
+                  </md-content>
+                </md-content>
+              </md-tab>
+              <md-tab label="ElasticSearch" ng-disabled="stepper.step6">
+                <md-content class="md-padding">
+                   <md-content>
                   <div class="step-content">
-                    <strong> Step 5:</strong>Incremental data<br/><br/>
-                    Incremental load is defined as the activity of loading new or updated columns in the table.
-                    AWS Glue detects schema changes in the data and adapts it.
-                    Till  now we were not having the e-mail address of the customers in the Customer data. Now we add the column in the customer table holding the email address of the customers. 
-                    This is because email consistently out performs other marketing activities. Actually, email  converts at nearly twice the normal in our experience – partly because they are regular and satisfied customers. Its certainly a lot cheaper than many of the activities retailers pursue.</br></br>
-
-                    Email is a critical piece of the marketing puzzle for e-Commerce businesses that can increase e-Commerce Conversions by Using Customer Data </br></br>
-
-                      <strong class="example">1. Using Past Online Purchases :</strong> Customers past behaviour is a good indicator of future behaviour. Past purchases inform you about the styles, brands, and products your customers are interested in. Sending the mail to the customer for the products based on customer interests can help in the increase of your business.</br></br>
-                      
-                      <strong class="example">2. Products Viewed :</strong> Viewing a product, especially multiple times, indicates interest. But, this data often goes unused in e-Commerce email marketing. Ideal use of this data is like : </br></br>
-                        1. After someone views a product but does not purchase it, send an email containing a buying guide to educate the potential customer about the item and provide the tools to evaluate it.</br></br>
-                        2. If the customer clicks on the buying guide, send a follow-up email to suggest urgency; for instance, a notification of a sale or limited inventory.</br></br>
-                      
-                      <strong class="example">3. Item left in Cart :</strong> Abandoned cart reminders probably are the most common way e-Commerce marketers use data to drive their email marketing programs. Limited inventory, a discount, and telling the customer you will remove the items from his cart soon are all ways to invoke sense of urgency. </br></br>
-                      
-
-                    <button class="btn btn-primary step-btn" ng-click="nextStep('outer', 5)" ng-disabled="btn1">Next</button>
+                  <div class="div-content"> 
+                     <h5 class="md-display-0">Step 3: ElasticSearch</h5>
                     </div>
-                  </md-content>
-                </md-step>
-                <md-step label="ElasticSearch " md-complete="step6.completed" ng-disabled="stepper.step6">
-                  <md-content>
-                  <div class="step-content">
-                    <strong> Step 6: </strong>ElasticSearch<br/><br/>
+                    <div class="div-content"> 
                     Yash Data Lake leverages Amazon Elasticsearch Service for data governance over e-commerce Raw dataset, Transformed Dataset and Enriched Dataset
-                    All the metadata relevant to data in data lake are indexed and available in the ElasticSearch Service dashboard.</br></br>
-                      <strong class="example">a) Demonstrate data governance</strong></br>
-                        The diagram below illustrates how the availability of new data S3 triggers the events, which trigger the Lambda functions to index data in the Elastic Search service.</br></br>
+                    All the metadata relevant to data in data lake are indexed and available in the ElasticSearch Service dashboard.
+                    </div>
+                    <div class="div-content"> 
+                      <strong class="example">a) Demonstrate data governance</strong>
+                      </div>
+                      <div class="div-content"> 
+                        The diagram below illustrates how the availability of new data S3 triggers the events, which trigger the Lambda functions to index data in the Elastic Search service.
+                        </div>
+                        <div class="div-content"> 
                         <img src="../../static/diagrams/quickstart_step6.png" class="stepper-image"/>
-                         <strong class="example"> b) Visualize the data indexed :</strong></br></br> When you click on Visit Elastic Search UI button, the following steps will be performed in your account</br>
+                        </div>
+                        <div class="div-content"> 
+                         <strong class="example"> b) Visualize the data indexed :</strong>
+                         </div>
+                         <div class="div-content"> 
+                          When you click on Visit Elastic Search UI button, the following steps will be performed in your account</br>
                           <div>a. Metadata of objects in S3 Buckets are indexed in the Elastic Search Service : </br>
                             i. Raw Bucket</br>
                             ii. Transformed Bucket</br>
                             iii. Published Bucket</br>
-                            </div></br>
+                            </div>
+                            </div>
                     <button class="btn btn-primary step-btn">Visit Elasticsearch UI</button>
-                    <button class="btn btn-primary content" ng-click="nextStep('outer', 6)" ng-disabled="btn1">Next</button>
+                    <button class="btn btn-primary" ng-click="nextStep('outer', 6)" ng-disabled="btn1">Next</button>
                     </div>
                   </md-content>
-                </md-step>
-                <md-step label="Redshift Spectrum" md-complete="step7.completed" ng-disabled="stepper.step7">
-                  <md-content style="overflow: inherit;">
-                  <div class="step-content">
-                    <strong> Step 7: </strong>Redshift Spectrum
-                    <md-steppers md-selected="subRedshift" md-stretch-steppers="always" style="min-height: 100%;">
-                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="redshiftStepper.stepA">
-                              <md-content style="overflow: inherit;">
-                              Yash Data Lake leverages Amazon Redshift and Amazon Redshift Spectrum capabilities to transform, aggregate and analyse Transformed Datasets. Redshift Spectrum allows data to be analysed directly from S3,  thus it can scale to support querying exabytes of data.</br></br>
-                                <strong class="example">a) Using Redshift Spectrum for queries</strong><br/>
-                                 The diagram below illustrates how E-commerce is being merged with the Data that resides in S3 and Redshift.</br></br>
-                                    <img src="../../static/diagrams/quickstart_step_7a.png" class="stepper-image"/><br/>
-                                  Transformed Dataset in S3 and Transformed Dataset in Redshift can be transformed, joined, analysed using Redshift Spectrum.</br></br>
-                                 
-                                 <strong class="example"> b) Demonstrate Spectrum analytics</strong></br></br>
+                </md-content>
+              </md-tab>
+              <md-tab label="Redshift Spectrum" ng-disabled="stepper.step7">
+                <md-content class="md-padding">
+                  <h5 class="md-display-0">Step 7: Redshift Spectrum</h5>
+                  <md-tabs md-dynamic-height md-border-bottom  md-selected="subRedshift">
+                    <md-tab label="Step A" ng-disabled="redshiftStepper.stepA">
+                       <md-content>
+                          <div class="div-content"> 
+                            Yash Data Lake leverages Amazon Redshift and Amazon Redshift Spectrum capabilities to transform, aggregate and analyse Transformed Datasets. Redshift Spectrum allows data to be analysed directly from S3,  thus it can scale to support querying exabytes of data.
+                          </div> 
+                           <div class="div-content"> 
+                                <strong class="example">a) Using Redshift Spectrum for queries</strong>
+                                </div>
+                                 <div class="div-content"> 
+                                 The diagram below illustrates how E-commerce is being merged with the Data that resides in S3 and Redshift.
+                                 </div>
+                                  <div class="div-content"> 
+                                    <img src="../../static/diagrams/quickstart_step_7a.png" class="stepper-image"/>
+                                    </div>
+                                     <div class="div-content"> 
+                                  Transformed Dataset in S3 and Transformed Dataset in Redshift can be transformed, joined, analysed using Redshift Spectrum.
+                                  </div>
+                                   <div class="div-content"> 
+                                 <strong class="example"> b) Demonstrate Spectrum analytics</strong>
+                                 </div>
+
                                  <div class="padding-all">
                                  <strong class="example">Payment type Distribution </strong>  <br/>
                                   The exponential growth of cross-border e-commerce has precipitated the rise of (alternative) payment methods. There is an endless number of payment methods. To know what customers are preferring will help us to provide more options in that category.</br></br>
@@ -419,42 +517,56 @@ md-steppers {
                                     AWS Glue Crawler will discover the metadata for the table generated from the queries.
                                     </div>
 
-                                 <button class="btn btn-primary step-btn" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary content" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
+                                 <button class="btn btn-primary step-btn" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
                                  <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                                  <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
-                            </md-step>
-                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="redshiftStepper.stepB">
-                              <md-content>
-                              Observe analytics output stored as Transformed Dataset in S3.
-                              <div class="padding-all">
-                              a. AWS Glue Job will transfer the Data stored in Redshift Transformed table to the Transformed Bucket in S3.<br/>
-                              b. Visit the AWS Management Console to see Spectrum analytics outputs stored as new datasets in Transformed bucket.</div><br/>
-                                   <img src="../../static/diagrams/quickstart_step_7b.png" class="stepper-image "/><br/>
-                                <button
-                                 class="btn btn-primary step-btn" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
-                                &nbsp;&nbsp;<button class="btn btn-primary content" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
-                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
-                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
-                              </md-content>
-                            </md-step>
-                          </md-steppers>
-                      </div>
-                  </md-content>
-                </md-step>
-                <md-step label="Athena" md-complete="step8.completed" ng-disabled="stepper.step8">
-                  <md-content>
+                    </md-tab>
+                    <md-tab label="Step B" ng-disabled="redshiftStepper.stepB">
+                      <md-content>
+                      <div class="div-content"> 
+                        Observe analytics output stored as Transformed Dataset in S3.
+                        </div>
+                        <div class="padding-all">
+                        <div class="div-content"> 
+                        a. AWS Glue Job will transfer the Data stored in Redshift Transformed table to the Transformed Bucket in S3.<br/>
+                        b. Visit the AWS Management Console to see Spectrum analytics outputs stored as new datasets in Transformed bucket.</div>
+                        </div>
+                        <div class="div-content"> 
+                             <img src="../../static/diagrams/quickstart_step_7b.png" class="stepper-image "/>
+                             </div>
+                          <button
+                           class="btn btn-primary step-btn" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
+                          &nbsp;&nbsp;<button class="btn btn-primary" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
+                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                           <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                        </md-content>
+                    </md-tab>
+                  </md-tabs>
+                </md-content>
+              </md-tab>
+              <md-tab label="Athena" ng-disabled="stepper.step8">
+                <md-content class="md-padding">
                   <div class="step-content">
-                    <strong> Step 8: </strong>Athena<br/><br/>
-                    Yash Data Lake leverages Amazon Athena for Data Exploration and  Ad-hoc  analysis.</br>
-
-                    The diagram given below depicts the use of Athena Service to query S3 directly.</br></br>
-                    <img src="../../static/diagrams/quickstart_step8.png" class="stepper-image"/></br>
-                      <strong class="example">a) Visit the Amazon Athena Console</strong></br></br> 
-                      a. When you click on Amazon Athena button, it will take you to the Amazon Athena Console where you can directly write the queries required for the analysis.</br>
-                      <a href="{{athenaLink}}" target="_blank"><button class="btn btn-primary">Amazon Athena</button></a> </br></br>
+                    <h5 class="md-display-0">Step 8: Athena</h5>
+                    <div class="div-content"> 
+                    Yash Data Lake leverages Amazon Athena for Data Exploration and  Ad-hoc  analysis.
+                    </div>
+                    <div class="div-content"> 
+                    The diagram given below depicts the use of Athena Service to query S3 directly.
+                    </div>
+                    <div class="div-content"> 
+                    <img src="../../static/diagrams/quickstart_step8.png" class="stepper-image"/>
+                    </div>
+                    <div class="div-content"> 
+                      <strong class="example">a) Visit the Amazon Athena Console</strong></div>
+                      <div class="div-content">  
+                      a. When you click on Amazon Athena button, it will take you to the Amazon Athena Console where you can directly write the queries required for the analysis.</div>
+                      <div class="div-content"> 
+                      <a href="{{athenaLink}}" target="_blank"><button class="btn btn-primary">Amazon Athena</button></a> </div>
+                      <div class="div-content"> 
     
-                       <strong class="example">b) Run Athena Queries</strong></br></br>
+                       <strong class="example">b) Run Athena Queries</strong></div>
                       a. In Amazon Athena Console to write queries. First, Select the athena_yash_db Database in the dropdown menu.</br> 
 
     
@@ -490,35 +602,32 @@ md-steppers {
 
 
                     <button class="btn btn-primary step-btn">Register Tables in Athena For Ad-Hoc Analysis</button>
-                    &nbsp;&nbsp;<button class="btn btn-primary content" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
+                    &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
                     </div>
-                  </md-content>
-                </md-step>
-                <md-step label="QuickSight" md-complete="step9.completed" ng-disabled="stepper.step9">
-                  <md-content>
-                  <div class="step-content">
-                    <strong> Step 9: </strong>QuickSight<br/><br/>
-                 
+                </md-content>
+              </md-tab>
+              <md-tab label="QuickSight" ng-disabled="stepper.step9">
+                <md-content class="md-padding">
+                  <h5 class="md-display-0">Step 9: Quicksight</h5>
+                 <md-tabs md-dynamic-height md-border-bottom  md-selected="subQuickSight">
+                    <md-tab label="Step A" ng-disabled="quickSightStepper.stepA">
+                      <md-content>
+                        Yash Data Lake leverages AWS QuickSight to build visualizations, perform ad hoc analysis, and quickly get business insights from Enriched Data. QuickSight presents data stories that are relevant to business users.</br></br>
 
-                     <md-steppers md-selected="subQuickSight" md-stretch-steppers="always" style="min-height: 100%;">
-                            <md-step label="Step A" md-complete="stepA.completed" ng-disabled="quickSightStepper.stepA">
-                              <md-content>
-                              Yash Data Lake leverages AWS QuickSight to build visualizations, perform ad hoc analysis, and quickly get business insights from Enriched Data. QuickSight presents data stories that are relevant to business users.</br></br>
+                        <strong class="example">Publish Data to Published Data S3 Bucket</strong></br></br>
+                            a. When you click on the Publish Data button, the following steps will be performed within your AWS account.
+                            <div class="padding-all">i. AWS Glue Crawler discovers Transformed Dataset and AWS Glue Job copies from Transformed Dataset to Published Data S3 Bucket.<br/>
+                            ii. AWS Glue Crawler create metadata for Published Dataset.</div></br></br>
 
-                              <strong class="example">Publish Data to Published Data S3 Bucket</strong></br></br>
-                                  a. When you click on the Publish Data button, the following steps will be performed within your AWS account.
-                                  <div class="padding-all">i. AWS Glue Crawler discovers Transformed Dataset and AWS Glue Job copies from Transformed Dataset to Published Data S3 Bucket.<br/>
-                                  ii. AWS Glue Crawler create metadata for Published Dataset.</div></br></br>
-      
-                                  <img src="../../static/diagrams/QuickstartWizard_step_9a.png" class="stepper-image"/>
-                                 <button class="btn btn-primary step-btn" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
-                                 <button class="btn btn-primary content" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
-                                 <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
-                                 <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
-                              </md-content>
-                            </md-step>
-                            <md-step label="Step B" md-complete="stepB.completed" ng-disabled="quickSightStepper.stepB">
-                              <md-content>
+                            <img src="../../static/diagrams/QuickstartWizard_step_9a.png" class="stepper-image"/>
+                           <button class="btn btn-primary step-btn" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
+                           <button class="btn btn-primary" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
+                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                           <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                        </md-content>
+                    </md-tab>
+                    <md-tab label="Step B" ng-disabled="quickSightStepper.stepB">
+                      <md-content>
                                <strong>Create visualisation</strong>
                                The Diagram illustrate QuickSight Dashboards, which tell compelling data stories to the business users.</br></br>
                               <div class="row">
@@ -699,17 +808,16 @@ md-steppers {
                       </div>
                     </div>
                                 <button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button>
-                                &nbsp;&nbsp;<button class="btn btn-primary content" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
+                                &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
                               </md-content>
-                            </md-step>
-                          </md-steppers>
-                          </div>
-                  </md-content>
-                </md-step>
-                <md-step label="Learn More" md-complete="step10.completed" ng-disabled="stepper.step10">
-                  <md-content>
+                    </md-tab>
+                  </md-tabs>
+                </md-content>
+              </md-tab>
+              <md-tab label="Learn More" ng-disabled="stepper.step10">
+                <md-content class="md-padding">
                   <div class="step-content">
-                    <strong> Step 10: </strong>Learn More<br/><br/>
+                    <h5 class="md-display-0">Step 10: Learn More</h5>
                     Congratulations, you have completed the Yash Data Lake walk-through!<br/><br/>
 
                     During this Quick Start, we have demonstrated best practices for get-started data lake in AWS.<br/><br/>
@@ -733,10 +841,11 @@ md-steppers {
                      <strong>YASH</strong> is a well-regarded, global  IT service provider, with customers in a number of industries. YASH provides a comprehensive portfolio of services and solutions that not only solve today’s IT challenges, but also address tomorrow’s business priorities. As a strategic premier application and infrastructure outsourcing services provider, YASH enables our customers to maximize the value of their IT investments, while helping them optimize their IT expenses for sustained business value.<br/><br/>
 
                     </div>
-                  </md-content>
-                </md-step>
-              </md-steppers>
-            </md-card>
+                </md-content>
+              </md-tab>
+            </md-tabs>
+          </md-content>
+        </div>
           </div>
           <div ng-if="show.loader">
             <div class="loader"></div>
