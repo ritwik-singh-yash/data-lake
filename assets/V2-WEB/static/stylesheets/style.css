@@ -134,7 +134,7 @@ a {
    }
    .step-btn {
      margin-left: 38%;
-     margin-bottom: 100px;
+    /* margin-bottom: 100px;*/
    }
    .content {
       margin-bottom: 100px;
@@ -213,4 +213,26 @@ _component-examples.scss:108
 }
 #step-content-13, #step-content-15 {
   overflow: auto !important;
+}
+ 
+ .div-content{
+   margin-top:10px;
+   margin-bottom:5px
+ }
+ .btn-next-space {
+  
+ }
+
+.headingCircle {
+    display: inline-block;
+    font-size: 10px;
+    background: #106cc8;
+    color: #fff;
+    border-radius: 14px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+}
+.md-tab {
+  line-height: 8px !important;
+    padding: 6px 22px !important;
 }
