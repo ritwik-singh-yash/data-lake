@@ -1,0 +1,725 @@
+{
+    "Description": "Sample KinesisAnalytics via CloudFormation",
+    "Parameters": {
+        "RawFirehoseBucket": {
+            "Default": "",
+            "Description": "Enter Bucket Name for Firehose1 storing data",
+            "Type": "String"
+        },
+        "TransformedFirehoseBucket": {
+            "Default": "",
+            "Description": "Enter Bucket Name for Firehose1 storing data",
+            "Type": "String"
+        },
+        "ReferenceDataSourceFileKey": {
+            "Default": "customer_updated_refrence.csv",
+            "Description": "Enter File Key for reference data source stored in ReferenceDataSourceBucket",
+            "Type": "String"
+        },
+        "KinesisApplication1Name": {
+            "Description": "Enter Application  Name 1",
+            "Type": "String"
+        },
+        "KinesisApplication2Name": {
+            "Description": "Enter application  Name 2 ",
+            "Type": "String"
+        },
+        "Firehose1Name": {
+            "Description": "Enter Bucket Name for Firehose1 storing data",
+            "Type": "String"
+        },
+        "Firehose2Name": {
+            "Description": "Enter Bucket Name for Firehose2 storing data",
+            "Type": "String"
+        },
+        "Firehose3Name": {
+            "Description": "Enter Bucket Name for Firehose3 storing data",
+            "Type": "String"
+        },
+        "Firehose4Name": {
+            "Description": "Enter Bucket Name for Firehose4 storing data",
+            "Type": "String"
+        },
+        "Firehose5Name": {
+            "Description": "Enter Bucket Name for Firehose4 storing data",
+            "Type": "String"
+        },
+        "RedshiftConnectionURL": {
+            "Description": "Redshift connection URL",
+            "Type": "String"
+        },
+        "RedshiftPassword": {
+            "Description": "Redshift password.",
+            "NoEcho": "true",
+            "Type": "String"
+        },
+        "RedshiftUsername": {
+            "Description": "Redshift username.",
+            "Type": "String"
+        },
+        "ElasticSearchDomianARN": {
+            "Description": "Domian ARN of ES",
+            "Type": "String"
+        },
+        "KinesisReferenceDataSourceRoleARN": {
+            "Description": "ARN of KinesisReferenceDataSourceRole",
+            "Type": "String"
+        },
+        "KinesisAnalyticsApplicationRoleARN": {
+            "Description": "ARN of KinesisAnalyticsApplicationRole",
+            "Type": "String"
+        },
+        "FirehoseDeliveryRoleARN": {
+            "Description": "ARN of FirehoseDeliveryRole",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "KinesisFirehoseDeliveryStream1": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "Firehose1Name"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "S3DestinationConfiguration": {
+                    "BucketARN": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:s3:::",
+                                {
+                                    "Ref": "RawFirehoseBucket"
+                                }
+                            ]
+                        ]
+                    },
+                    "BufferingHints": {
+                        "IntervalInSeconds": "60",
+                        "SizeInMBs": "50"
+                    },
+                    "CompressionFormat": "UNCOMPRESSED",
+                    "Prefix": "Firehose1_Output/",
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    }
+                }
+            }
+        },
+        "KinesisFirehoseDeliveryStream2": {
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "Firehose2Name"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "RedshiftDestinationConfiguration": {
+                    "ClusterJDBCURL": {
+                        "Ref": "RedshiftConnectionURL"
+                    },
+                    "CopyCommand": {
+                        "CopyOptions": "region 'us-west-2' delimiter ',' csv",
+                        "DataTableName": "orders",
+                        "DataTableColumns": "customer_id,sku,amount_spent,order_date,longitude,latitude"
+                    },
+                    "Password": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": 60,
+                            "SizeInMBs": 60
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Firehose2_Output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    },
+                    "Username": {
+                        "Ref": "RedshiftUsername"
+                    }
+                }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
+        },
+        "KinesisFirehoseDeliveryStream3": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "Firehose3Name"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 50
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticSearchDomianARN"
+                    },
+                    "IndexName": "datalake-metadata-version1",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "datalake-metadata-1",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "50"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Firehose3_ES_Output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisFirehoseDeliveryStream4": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "Firehose4Name"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 50
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticSearchDomianARN"
+                    },
+                    "IndexName": "datalake-metadata-version1",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "datalake-metadata-2",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "50"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Firehose4_ES_Output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisFirehoseDeliveryStream5": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "Firehose5Name"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 50
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticSearchDomianARN"
+                    },
+                    "IndexName": "datalake-metadata-version1",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "datalake-metadata-3",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "50"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Firehose5_ES_Output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "kinesisAnalyticsCleanOrdersApp": {
+            "Type": "AWS::KinesisAnalytics::Application",
+            "DependsOn": [
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication1Name"
+                },
+                "ApplicationDescription": "SampleApp",
+                "ApplicationCode": "-- ** Continuous Filter ** \r\n-- Performs a continuous filter based on a WHERE condition.\r\n--          .----------.   .----------.   .----------.              \r\n--          |  SOURCE  |   |  INSERT  |   |  DESTIN. |              \r\n-- Source-->|  STREAM  |-->| & SELECT |-->|  STREAM  |-->Destination\r\n--          |          |   |  (PUMP)  |   |          |              \r\n--          '----------'   '----------'   '----------'               \r\n-- STREAM (in-application): a continuously updated entity that you can SELECT from and INSERT into like a TABLE\r\n-- PUMP: an entity used to continuously 'SELECT ... FROM' a source STREAM, and INSERT SQL results into an output STREAM\r\n-- Create output stream, which can be used to send to a destination\r\nCREATE OR REPLACE STREAM \"DESTINATION_SQL_STREAM\" (customer_id VARCHAR(64), sku VARCHAR(64), amt_spent REAL, order_date timestamp, longitude double, latitude double);\r\n-- Create pump to insert into output \r\nCREATE OR REPLACE PUMP \"STREAM_PUMP\" AS INSERT INTO \"DESTINATION_SQL_STREAM\"\r\n-- Select all columns from source stream\r\nSELECT STREAM col0, col1, col4, col2, col5, col6\r\nFROM \"SOURCE_SQL_STREAM_001\"\r\n-- LIKE compares a string to a string pattern (_ matches all char, % matches substring)\r\n-- SIMILAR TO compares string to a regex, may use ESCAPE\r\nWHERE col0 IS NOT NULL;\n",
+                "Inputs": [
+                    {
+                        "NamePrefix": "SOURCE_SQL_STREAM",
+                        "InputParallelism": {
+                            "Count": 1
+                        },
+                        "InputSchema": {
+                            "RecordColumns": [
+                                {
+                                    "SqlType": "VARCHAR(64)",
+                                    "Name": "COL0"
+                                },
+                                {
+                                    "SqlType": "VARCHAR(16)",
+                                    "Name": "COL1"
+                                },
+                                {
+                                    "SqlType": "TIMESTAMP",
+                                    "Name": "COL2"
+                                },
+                                {
+                                    "SqlType": "INTEGER",
+                                    "Name": "COL3"
+                                },
+                                {
+                                    "SqlType": "DOUBLE",
+                                    "Name": "COL4"
+                                },
+                                {
+                                    "SqlType": "DOUBLE",
+                                    "Name": "COL5"
+                                },
+                                {
+                                    "SqlType": "DOUBLE",
+                                    "Name": "COL6"
+                                },
+                                {
+                                    "SqlType": "VARCHAR(16)",
+                                    "Name": "COL7"
+                                }
+                            ],
+                            "RecordFormat": {
+                                "MappingParameters": {
+                                    "CSVMappingParameters": {
+                                        "RecordColumnDelimiter": ",",
+                                        "RecordRowDelimiter": "\n"
+                                    }
+                                },
+                                "RecordFormatType": "CSV"
+                            },
+                            "RecordEncoding": "UTF-8"
+                        },
+                        "KinesisFirehoseInput": {
+                            "ResourceARN": {
+                                "Fn::GetAtt": [
+                                    "KinesisFirehoseDeliveryStream1",
+                                    "Arn"
+                                ]
+                            },
+                            "RoleARN": {
+                                "Ref": "KinesisAnalyticsApplicationRoleARN"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "kinesisAnalyticsCleanOrdersAppOutput": {
+            "Type": "AWS::KinesisAnalytics::ApplicationOutput",
+            "DependsOn": [
+                "kinesisAnalyticsCleanOrdersApp",
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication1Name"
+                },
+                "Output": {
+                    "Name": "DESTINATION_SQL_STREAM",
+                    "DestinationSchema": {
+                        "RecordFormatType": "CSV"
+                    },
+                    "KinesisFirehoseOutput": {
+                        "ResourceARN": {
+                            "Fn::GetAtt": [
+                                "KinesisFirehoseDeliveryStream2",
+                                "Arn"
+                            ]
+                        },
+                        "RoleARN": {
+                            "Ref": "KinesisAnalyticsApplicationRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisAnalyticsAggregateOrdersApp": {
+            "Type": "AWS::KinesisAnalytics::Application",
+            "DependsOn": [
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2",
+                "KinesisFirehoseDeliveryStream3",
+                "KinesisFirehoseDeliveryStream4",
+                "kinesisAnalyticsCleanOrdersApp"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication2Name"
+                },
+                "ApplicationDescription": "Application 2",
+                "ApplicationCode": "CREATE OR REPLACE STREAM \"DESTINATION_SQL_STREAM_1\" (hour_minute varchar(255), age_grp_category VARCHAR(255),count_customers DOUBLE);\r\nCREATE OR REPLACE PUMP \"STREAM_PUMP\" AS INSERT INTO \"DESTINATION_SQL_STREAM_1\"\r\n   SELECT STREAM TIMESTAMP_TO_CHAR('YYYY-MM-dd''T''HH:mm:ss', FLOOR(MONOTONIC(\"SOURCE_SQL_STREAM_001\".col3) TO MINUTE)) AS \"timestamp\",\r\n   case \r\n   WHEN \"cust\".\"age\">= 18 AND \"cust\".\"age\" < 30 THEN '18-29'\r\n   WHEN \"cust\".\"age\">= 30 AND \"cust\".\"age\" < 50 THEN '30-49'\r\n   WHEN \"cust\".\"age\">= 50 AND \"cust\".\"age\" < 65 THEN '50-64'\r\n   WHEN \"cust\".\"age\">= 65 AND \"cust\".\"age\" < 80 THEN '65-older'\r\n   END AS age_grp_category, sum(\"SOURCE_SQL_STREAM_001\".col2) AS count_customers\r\n   FROM \"SOURCE_SQL_STREAM_001\"\r\n   JOIN \"customers\" as \"cust\"\r\n   ON \"SOURCE_SQL_STREAM_001\".col0 = \"cust\".\"customer_id\"\r\n   GROUP BY FLOOR(MONOTONIC(\"SOURCE_SQL_STREAM_001\".col3) TO MINUTE), \"cust\".\"age\";\r\n   \r\n   -- 2. Top Selling Product per Minute\r\nCREATE OR REPLACE STREAM \"DESTINATION_SQL_STREAM_2\" (hour_minute varchar(255), sku varchar(255), count_orders DOUBLE);\r\nCREATE OR REPLACE PUMP \"STREAM_PUMP1\" AS INSERT INTO \"DESTINATION_SQL_STREAM_2\"\r\n   SELECT STREAM TIMESTAMP_TO_CHAR('YYYY-MM-dd''T''HH:mm:ss', FLOOR(MONOTONIC(\"SOURCE_SQL_STREAM_001\".col3) TO MINUTE)) AS \"timestamp\",\r\n   \"SOURCE_SQL_STREAM_001\".col1, count(*) AS count_orders\r\n   FROM \"SOURCE_SQL_STREAM_001\"\r\n   GROUP BY FLOOR(MONOTONIC(\"SOURCE_SQL_STREAM_001\".col3) TO MINUTE),\"SOURCE_SQL_STREAM_001\".col1;\r\n   \r\n\r\n\r\n-- 3. Geo Location Map using orders Data Directly creating geoLocation by manipulating\r\nCREATE OR REPLACE STREAM \"DESTINATION_SQL_STREAM_3\" (hour_minute varchar(255), GEOLOCATION VARCHAR(255));\r\nCREATE OR REPLACE PUMP \"STREAM_PUMP2\" AS INSERT INTO \"DESTINATION_SQL_STREAM_3\"\r\nSELECT STREAM TIMESTAMP_TO_CHAR('YYYY-MM-dd''T''HH:mm:ss', FLOOR(MONOTONIC(\"SOURCE_SQL_STREAM_001\".col3) TO MINUTE)) AS \"timestamp\",\r\ncast(\"SOURCE_SQL_STREAM_001\".col5 as VARCHAR(255)) || ',' || cast(\"SOURCE_SQL_STREAM_001\".col4 as VARCHAR(255))\r\nFROM \"SOURCE_SQL_STREAM_001\"\r\nGROUP BY FLOOR(MONOTONIC(\"SOURCE_SQL_STREAM_001\".col3) TO MINUTE),\"SOURCE_SQL_STREAM_001\".col5,\"SOURCE_SQL_STREAM_001\".col4;\n",
+                "Inputs": [
+                    {
+                        "NamePrefix": "SOURCE_SQL_STREAM",
+                        "InputParallelism": {
+                            "Count": 1
+                        },
+                        "InputSchema": {
+                            "RecordColumns": [
+                                {
+                                    "SqlType": "VARCHAR(64)",
+                                    "Name": "COL0"
+                                },
+                                {
+                                    "SqlType": "VARCHAR(64)",
+                                    "Name": "COL1"
+                                },
+                                {
+                                    "SqlType": "DOUBLE",
+                                    "Name": "COL2"
+                                },
+                                {
+                                    "SqlType": "TIMESTAMP",
+                                    "Name": "COL3"
+                                },
+                                {
+                                    "SqlType": "DOUBLE",
+                                    "Name": "COL4"
+                                },
+                                {
+                                    "SqlType": "DOUBLE",
+                                    "Name": "COL5"
+                                }
+                            ],
+                            "RecordFormat": {
+                                "MappingParameters": {
+                                    "CSVMappingParameters": {
+                                        "RecordColumnDelimiter": ",",
+                                        "RecordRowDelimiter": "\n"
+                                    }
+                                },
+                                "RecordFormatType": "CSV"
+                            },
+                            "RecordEncoding": "UTF-8"
+                        },
+                        "KinesisFirehoseInput": {
+                            "ResourceARN": {
+                                "Fn::GetAtt": [
+                                    "KinesisFirehoseDeliveryStream2",
+                                    "Arn"
+                                ]
+                            },
+                            "RoleARN": {
+                                "Ref": "KinesisAnalyticsApplicationRoleARN"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "ApplicationReferenceDataSource": {
+            "Type": "AWS::KinesisAnalytics::ApplicationReferenceDataSource",
+            "DependsOn": [
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2",
+                "KinesisFirehoseDeliveryStream3",
+                "KinesisFirehoseDeliveryStream4",
+                "kinesisAnalyticsCleanOrdersApp",
+                "KinesisAnalyticsAggregateOrdersApp"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication2Name"
+                },
+                "ReferenceDataSource": {
+                    "TableName": "customers",
+                    "ReferenceSchema": {
+                        "RecordColumns": [
+                            {
+                                "SqlType": "VARCHAR(255)",
+                                "Name": "customer_id"
+                            },
+                            {
+                                "SqlType": "VARCHAR(255)",
+                                "Name": "first_name"
+                            },
+                            {
+                                "SqlType": "VARCHAR(255)",
+                                "Name": "last_name"
+                            },
+                            {
+                                "SqlType": "VARCHAR(64)",
+                                "Name": "region"
+                            },
+                            {
+                                "SqlType": "VARCHAR(255)",
+                                "Name": "state"
+                            },
+                            {
+                                "SqlType": "BIGINT",
+                                "Name": "cbgid"
+                            },
+                            {
+                                "SqlType": "VARCHAR(20)",
+                                "Name": "marital_status"
+                            },
+                            {
+                                "SqlType": "VARCHAR(40)",
+                                "Name": "education_level"
+                            },
+                            {
+                                "SqlType": "INT",
+                                "Name": "age"
+                            },
+                            {
+                                "SqlType": "VARCHAR(2)",
+                                "Name": "gender"
+                            }
+                        ],
+                        "RecordFormat": {
+                            "MappingParameters": {
+                                "CSVMappingParameters": {
+                                    "RecordColumnDelimiter": ",",
+                                    "RecordRowDelimiter": "\n"
+                                }
+                            },
+                            "RecordFormatType": "CSV"
+                        },
+                        "RecordEncoding": "UTF-8"
+                    },
+                    "S3ReferenceDataSource": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "FileKey": {
+                            "Ref": "ReferenceDataSourceFileKey"
+                        },
+                        "ReferenceRoleARN": {
+                            "Ref": "KinesisReferenceDataSourceRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisAnalyticsAggregateOrdersAppOutput1": {
+            "Type": "AWS::KinesisAnalytics::ApplicationOutput",
+            "DependsOn": [
+                "kinesisAnalyticsCleanOrdersApp",
+                "KinesisAnalyticsAggregateOrdersApp",
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2",
+                "KinesisFirehoseDeliveryStream3",
+                "KinesisFirehoseDeliveryStream4"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication2Name"
+                },
+                "Output": {
+                    "Name": "DESTINATION_SQL_STREAM_1",
+                    "DestinationSchema": {
+                        "RecordFormatType": "JSON"
+                    },
+                    "KinesisFirehoseOutput": {
+                        "ResourceARN": {
+                            "Fn::GetAtt": [
+                                "KinesisFirehoseDeliveryStream3",
+                                "Arn"
+                            ]
+                        },
+                        "RoleARN": {
+                            "Ref": "KinesisAnalyticsApplicationRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisAnalyticsAggregateOrdersAppOutput2": {
+            "Type": "AWS::KinesisAnalytics::ApplicationOutput",
+            "DependsOn": [
+                "kinesisAnalyticsCleanOrdersApp",
+                "KinesisAnalyticsAggregateOrdersApp",
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2",
+                "KinesisFirehoseDeliveryStream3",
+                "KinesisFirehoseDeliveryStream4"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication2Name"
+                },
+                "Output": {
+                    "Name": "DESTINATION_SQL_STREAM_2",
+                    "DestinationSchema": {
+                        "RecordFormatType": "JSON"
+                    },
+                    "KinesisFirehoseOutput": {
+                        "ResourceARN": {
+                            "Fn::GetAtt": [
+                                "KinesisFirehoseDeliveryStream4",
+                                "Arn"
+                            ]
+                        },
+                        "RoleARN": {
+                            "Ref": "KinesisAnalyticsApplicationRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisAnalyticsAggregateOrdersAppOutput3": {
+            "Type": "AWS::KinesisAnalytics::ApplicationOutput",
+            "DependsOn": [
+                "kinesisAnalyticsCleanOrdersApp",
+                "KinesisAnalyticsAggregateOrdersApp",
+                "KinesisFirehoseDeliveryStream1",
+                "KinesisFirehoseDeliveryStream2",
+                "KinesisFirehoseDeliveryStream3",
+                "KinesisFirehoseDeliveryStream4"
+            ],
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "KinesisApplication2Name"
+                },
+                "Output": {
+                    "Name": "DESTINATION_SQL_STREAM_3",
+                    "DestinationSchema": {
+                        "RecordFormatType": "JSON"
+                    },
+                    "KinesisFirehoseOutput": {
+                        "ResourceARN": {
+                            "Fn::GetAtt": [
+                                "KinesisFirehoseDeliveryStream5",
+                                "Arn"
+                            ]
+                        },
+                        "RoleARN": {
+                            "Ref": "KinesisAnalyticsApplicationRoleARN"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "ApplicationPhysicalResourceId": {
+            "Value": "kinesisAnalyticsCleanOrdersApp"
+        },
+        "KinesisAnalyticalApplication1": {
+            "Value": {
+                "Ref": "KinesisApplication1Name"
+            }
+        },
+        "KinesisAnalyticalApplication2": {
+            "Value": {
+                "Ref": "KinesisApplication2Name"
+            }			
+        },		
+		"Firehose1": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream1"
+            }
+        },
+		"Firehose2": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream2"
+            }
+        },
+		"Firehose3": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream3"
+            }
+        },
+		"Firehose4": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream4"
+            }
+        },
+		"Firehose5": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream5"
+            }
+			
+        }
+    }
+}
