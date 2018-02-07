@@ -206,6 +206,24 @@
         "RawBucketRef": {
             "Description": "reference of the bucket to which the data is fetched",
             "Type": "String"
+        },
+        "DatasetS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "yash-quickstart-datalake-datasets",
+            "Description": "S3 bucket where the sample dataset is installed. The bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen. Use this parameter to specify the S3 bucket name that you would like the Quick Start to to load, if you decide to use a different dataset, or if you decide to customize or extend the Quick Start dataset. (For more information, see Using Your Own Dataset.) Keep the default setting to use the sample dataset included with the Quick Start.",
+            "Type": "String"
+        },
+        "DatasetS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "quickstart-datalake-yash/data/v2",
+            "Description": "S3 key prefix where the sample dataset is installed. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash, which is automatically added. Use this parameter to specify the location for the dataset you would like the Quick Start to load, if you decide to use a different dataset, or if you decide to customize or extend the Quick Start dataset. (For more information, see Using Your Own Dataset.) Keep the default setting to use the sample dataset included with the Quick Start.",
+            "Type": "String"
+        },
+        "WebsiteHostingbucket": {
+            "Description": "website hosting bucket",
+            "Type": "String"
         }
     },
     "Rules": {
@@ -511,6 +529,52 @@
                             "Statement": [
                                 {
                                     "Action": [
+                                        "s3:*"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:s3:::${WebsiteHostingbucket}/*",
+                                                {
+                                                    "WebsiteHostingbucket": {
+                                                        "Ref": "WebsiteHostingbucket"
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:s3:::${WebsiteHostingbucket}/",
+                                                {
+                                                    "WebsiteHostingbucket": {
+                                                        "Ref": "WebsiteHostingbucket"
+                                                    }
+                                                }
+                                            ]
+                                        },
+										{
+                                            "Fn::Sub": [
+                                                "arn:aws:s3:::${WebsiteHostingbucket}",
+                                                {
+                                                    "WebsiteHostingbucket": {
+                                                        "Ref": "WebsiteHostingbucket"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    "Effect": "Allow"
+                                }
+                            ]
+                        },
+                        "PolicyName": "website-hosting-data-fetch-policy"
+                    },
+                    {
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
                                         "logs:CreateLogStream",
                                         "logs:GetLogEvents",
                                         "logs:PutLogEvents",
@@ -676,13 +740,23 @@
                         "buckets": {
                             "Ref": "QSS3BucketName"
                         }
+                    },
+                    "S3AccessCredsForWebsiteData": {
+                        "type": "S3",
+                        "roleName": {
+                            "Ref": "BastionHostRole"
+                        },
+                        "buckets": {
+                            "Ref": "QSS3BucketName"
+                        }
                     }
                 },
                 "AWS::CloudFormation::Init": {
                     "configSets": {
                         "order": [
                             "bastionConfig",
-                            "copyDataConfig"
+                            "copyDataConfig",
+                            "websiteDataConfig"
                         ]
                     },
                     "bastionConfig": {
@@ -742,7 +816,7 @@
                             "/tmp/copydata.sh": {
                                 "source": {
                                     "Fn::Sub": [
-                                        "https://${QSS3Region}.amazonaws.com/${QSS3BucketName}/${QSS3KeyPrefix}/copydata.sh",
+                                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}/copydata.sh",
                                         {
                                             "QSS3Region": {
                                                 "Fn::If": [
@@ -764,10 +838,60 @@
                             "copy-data": {
                                 "command": {
                                     "Fn::Sub": [
-                                        "sh /tmp/copydata.sh ${BucketName}/",
+                                        "sh /tmp/copydata.sh ${BucketName} ${DatasetS3BucketName} ${DatasetS3KeyPrefix}",
                                         {
                                             "BucketName": {
                                                 "Ref": "RawBucketRef"
+                                            },
+                                            "DatasetS3BucketName": {
+                                                "Ref": "DatasetS3BucketName"
+                                            },
+                                            "DatasetS3KeyPrefix": {
+                                                "Ref": "DatasetS3KeyPrefix"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "websiteDataConfig": {
+                        "files": {
+                            "/tmp/websitedatacopy.sh": {
+                                "source": {
+                                    "Fn::Sub": [
+                                        "https://${QSS3BucketName}.${QSS3Region}.amazonaws.com/${QSS3KeyPrefix}/websitedatacopy.sh",
+                                        {
+                                            "QSS3Region": {
+                                                "Fn::If": [
+                                                    "GovCloudCondition",
+                                                    "s3-us-gov-west-1",
+                                                    "s3"
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                "mode": "000777",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCredsForWebsiteData"
+                            }
+                        },
+                        "commands": {
+                            "website-data-copy": {
+                                "command": {
+                                    "Fn::Sub": [
+                                        "sh /tmp/websitedatacopy.sh ${QSS3BucketName} ${QSS3KeyPrefix} ${WebsiteHostingbucket}",
+                                        {
+                                            "QSS3BucketName": {
+                                                "Ref": "QSS3BucketName"
+                                            },
+                                            "QSS3KeyPrefix": {
+                                                "Ref": "QSS3KeyPrefix"
+                                            },
+                                            "WebsiteHostingbucket": {
+                                                "Ref": "WebsiteHostingbucket"
                                             }
                                         }
                                     ]
