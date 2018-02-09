@@ -146,10 +146,13 @@ a {
 .md-step md-step-label-wrapper span { float:right !important;}
 .md-step md-step-label-wrapper { text-align: center !important;}
 .stepper-image {
-  width: 100%;
-  height: 100%;
+  width: 90%;
+  height: 55%;
 }
-
+.stepper-image-small {
+  width: 90%;
+  height: 70%;
+}
 .query {
     background-color: aliceblue;
     border: solid 1px;
