@@ -1,9 +1,12 @@
 app.controller('wizardController', function($scope, $http, $interval) {
 var lambda_api = _config.api.Value;
 var userPoolProviderName = _config.userPoolProviderName;
+$scope.amazonQuickSightUrl = "https://"+_config.region.Value+".quicksight.aws.amazon.com/sn/console/get-user-email?#"
 var obj = {
   [userPoolProviderName]: localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken")
 };
+$scope.elasticDashboardUrl = 'https://'+_config.StreamMetaDataURL
+console.log('elasticDashboardUrl',$scope.elasticDashboardUrl)
 console.log('localStorage.getIte',localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken"))
 var crawler_lambda_api = lambda_api + "crawler";
 var redshift_crawler_lambda_api = lambda_api + "runredshiftcrawler";
@@ -13,7 +16,7 @@ var transform_crawler_lambda_api = lambda_api + "transformcrawler";
 var redshift_raw_to_transform_ETL = lambda_api + "transformedredshift";
 var redshift_spectrum = lambda_api + "redshift";
 var props = lambda_api + "prop";
-$scope.kibanaUrl = _config.KibanaURL
+$scope.kibanaUrl = 'https://'+_config.KibanaURL
 $scope.athenaLink = "https://"+_config.region.Value+".console.aws.amazon.com/athena/home?region="+_config.region.Value+"#query"
 $scope.isRedshiftNext = true
 $scope.isRedshifttransform = true
@@ -649,6 +652,7 @@ $scope.stopKinesisApp = function() {
  }
  $scope.createRedshiftCrawler = function() {
    $scope.show.loader = true
+   $scope.isRedshiftNext = true
   $scope.btn1 = true
   $http({
     method: 'GET',
@@ -848,6 +852,6 @@ $scope.stopKinesisApp = function() {
        });
   }
   $scope.resfresh = $interval($scope.refreshToken, 900000);
-});
+})
 
 
