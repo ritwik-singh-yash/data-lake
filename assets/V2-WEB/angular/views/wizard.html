@@ -196,8 +196,8 @@ md-steppers {
                     <div class="div-content">
                       The architecture diagram given below provides a high-level overview of Yash Data Lake in AWS. All of the AWS resources illustrated below were deployed to your account when you launched the Yash Data lake. As we step through this guide, sample data from E-commerce will be ingested into your account using cloud formation. After this demonstration, you can remove the data and start using Yash Data lake architecture with your own data.
                     </div>
-                    <div class="div-content">
-                      <img src="../../static/diagrams/getting-started.png" class="stepper-image"/>
+                    <div class="div-content" style="text-align: center;">
+                      <img src="../../static/diagrams/getting-started.png" class="stepper-image-small"/>
                     </div>
                     <button class="btn btn-primary step-btn" ng-click="createProp()">Begin walk-through</button>
                   </div>
@@ -228,8 +228,8 @@ md-steppers {
                     <div class="div-content">
                     <strong class="example">Review Dataset contributed by Data Provider</strong>
                     </div>
-                    <div class="div-content">
-                       <img src="../../static/diagrams/QuickStart_Step2.png" class="stepper-image"/></div>
+                    <div class="div-content" style="text-align: center;">
+                       <img src="../../static/diagrams/QuickStart_Step2.png" class="stepper-image-small"/></div>
                     <button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
                             <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
@@ -249,8 +249,8 @@ md-steppers {
                              <div class="div-content">
                             AWS Glue creates four ETL Jobs for the creation of Transformed dataset and writes it in S3 Bucket named TRANSFORMED_BUCKET_DB partition by year, month & day.
                             </div>
-                            <div class="div-content">
-                              <img src="../../static/diagrams/quickstart_step3a.png" class="stepper-image"/>
+                            <div class="div-content" style="text-align: center;">
+                              <img src="../../static/diagrams/quickstart_step3a.png" class="stepper-image-small"/>
                             </div>
                             <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
                            <br/><br/>
@@ -268,8 +268,8 @@ md-steppers {
                          <div class="div-content"> 
                           AWS Glue Crawler discovers Transformed data and catalogs metadata about your data stores into a central catalog.
                           </div>
-                          <div class="div-content"> 
-                           <img src="../../static/diagrams/quickstart_Step3b.png" class="stepper-image"/>
+                          <div class="div-content" style="text-align: center;"> 
+                           <img src="../../static/diagrams/quickstart_Step3b.png" class="stepper-image-small"/>
                            </div>
                           <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/>
                           <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
@@ -298,8 +298,8 @@ md-steppers {
                                 </div>
                               </div>
                             </div>
-                            <div class="div-content"> 
-                              <img src="../../static/diagrams/quickstart_step3c.png" class="stepper-image"/>
+                            <div class="div-content" style="text-align: center;"> 
+                              <img src="../../static/diagrams/quickstart_step3c.png" class="stepper-image-small"/>
                             </div>
                           <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/>
                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
@@ -321,8 +321,8 @@ md-steppers {
                     <div class="div-content">
                       This diagram illustrate how orders stream get ingested in the real-time by the kinesis firehose and stored in Redshift. Kinesis Analytics provides real-time analytics on orders data ,results of which are stored in ElasticSearch service that provides real-time dashboards on business relevant KPIs using Kibana
                     </div>
-                    <div class="div-content">  
-                      <img src="../../static/diagrams/quickstart_step4.png" class="stepper-image"/>
+                    <div class="div-content" style="text-align: center;">  
+                      <img src="../../static/diagrams/quickstart_step4.png" class="stepper-image-small"/>
                     </div>
                     <div class="div-content">
                       <strong class="example">b. Streaming Data Creation and Analytics</strong>
@@ -360,14 +360,22 @@ md-steppers {
                           <div class="div-content">
                             This dashboard shows total revenue for orders grouped by age groups computed in a sliding 1 minute window.
                           </div>
-                          <div class="div-content">
-                            <img src="../../static/diagrams/step4_1.png" class="stepper-image"/>
+                          <div class="div-content" style="text-align: center;">
+                            <img src="../../static/diagrams/agegroup.png" class="stepper-image-small"/>
                             </div>
                               <strong class="example">Top Selling Products</strong></br>
 
                               This dashboard ranks the most popular product-Id computed in a sliding 1 minute window.</br></br>
-                              <img src="../../static/diagrams/step4_2.png" class="stepper-image"/></br></br>
-                              <strong>Kibana URL: </strong><br/><a href="{{kibanaUrl}}"><h6>{{kibanaUrl}}</h6></a>
+                              <div class="div-content" style="text-align: center;">
+                              <img src="../../static/diagrams/topProducts.png" class="stepper-image-small"/>
+                              </div></br>
+                              <strong class="example">Orders Geo-Location</strong></br>
+                              This visualization shows the transactions geo-location that can help to identify where are the traffic congestion zones.</br></br>
+                              <div class="div-content" style="text-align: center;">
+                              <img src="../../static/diagrams/geo.png" class="stepper-image-small"/>
+                              </div></br>
+                              <div class="div-content"></div>
+                              <strong>Kibana URL: </strong><br/><a href="{{elasticDashboardUrl}}" target="_blank"><h6>{{elasticDashboardUrl}}</h6></a>
                               <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Stop Order Data Stream" to stop data generation</div></br>
                     <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
                     <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="enableStartStream">Stop Order Data Stream</button>
@@ -428,8 +436,8 @@ md-steppers {
                       <div class="div-content"> 
                         The diagram below illustrates how the availability of new data S3 triggers the events, which trigger the Lambda functions to index data in the Elastic Search service.
                         </div>
-                        <div class="div-content"> 
-                        <img src="../../static/diagrams/quickstart_step6.png" class="stepper-image"/>
+                        <div class="div-content" style="text-align: center;"> 
+                        <img src="../../static/diagrams/quickstart_step6.png" class="stepper-image-small"/>
                         </div>
                         <div class="div-content"> 
                          <strong class="example"> b) Visualize the data indexed :</strong>
@@ -442,7 +450,7 @@ md-steppers {
                             iii. Published Bucket</br>
                             </div>
                             </div>
-                    <button class="btn btn-primary step-btn">Visit Elasticsearch UI</button>
+                    <a href="{{kibanaUrl}}" target="_blank"><button class="btn btn-primary step-btn">Visit Elasticsearch UI</button></a>
                     <button class="btn btn-primary" ng-click="nextStep('outer', 6)" ng-disabled="btn1">Next</button>
                     </div>
                   </md-content>
@@ -463,8 +471,8 @@ md-steppers {
                                  <div class="div-content"> 
                                  The diagram below illustrates how E-commerce is being merged with the Data that resides in S3 and Redshift.
                                  </div>
-                                  <div class="div-content"> 
-                                    <img src="../../static/diagrams/quickstart_step_7a.png" class="stepper-image"/>
+                                  <div class="div-content" style="text-align: center;"> 
+                                    <img src="../../static/diagrams/quickstart_step_7a.png" class="stepper-image-small"/>
                                     </div>
                                      <div class="div-content"> 
                                   Transformed Dataset in S3 and Transformed Dataset in Redshift can be transformed, joined, analysed using Redshift Spectrum.
@@ -532,12 +540,12 @@ md-steppers {
                         a. AWS Glue Job will transfer the Data stored in Redshift Transformed table to the Transformed Bucket in S3.<br/>
                         b. Visit the AWS Management Console to see Spectrum analytics outputs stored as new datasets in Transformed bucket.</div>
                         </div>
-                        <div class="div-content"> 
-                             <img src="../../static/diagrams/quickstart_step_7b.png" class="stepper-image "/>
+                        <div class="div-content" style="text-align: center;"> 
+                             <img src="../../static/diagrams/quickstart_step_7b.png" class="stepper-image-small"/>
                              </div>
                           <button
                            class="btn btn-primary step-btn" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
-                          &nbsp;&nbsp;<button class="btn btn-primary" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
+                          &nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                         </md-content>
@@ -555,8 +563,8 @@ md-steppers {
                     <div class="div-content"> 
                     The diagram given below depicts the use of Athena Service to query S3 directly.
                     </div>
-                    <div class="div-content"> 
-                    <img src="../../static/diagrams/quickstart_step8.png" class="stepper-image"/>
+                    <div class="div-content" style="text-align: center;"> 
+                    <img src="../../static/diagrams/quickstart_step8.png" class="stepper-image-small"/>
                     </div>
                     <div class="div-content"> 
                       <strong class="example">a) Visit the Amazon Athena Console</strong></div>
@@ -618,8 +626,9 @@ md-steppers {
                             a. When you click on the Publish Data button, the following steps will be performed within your AWS account.
                             <div class="padding-all">i. AWS Glue Crawler discovers Transformed Dataset and AWS Glue Job copies from Transformed Dataset to Published Data S3 Bucket.<br/>
                             ii. AWS Glue Crawler create metadata for Published Dataset.</div></br></br>
-
+                            <div class="div-content" style="text-align: center;"> 
                             <img src="../../static/diagrams/QuickstartWizard_step_9a.png" class="stepper-image"/>
+                            </div>
                            <button class="btn btn-primary step-btn" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
                            <button class="btn btn-primary" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
@@ -807,7 +816,7 @@ md-steppers {
                         </div>
                       </div>
                     </div>
-                                <button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button>
+                                <a href="{{amazonQuickSightUrl}}" target="_blank"><button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button></a>
                                 &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
                               </md-content>
                     </md-tab>
