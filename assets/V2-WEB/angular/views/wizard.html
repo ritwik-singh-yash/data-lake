@@ -572,7 +572,7 @@ md-steppers {
                       <div class="div-content">  
                       a. When you click on Amazon Athena button, it will take you to the Amazon Athena Console where you can directly write the queries required for the analysis.</div>
                       <div class="div-content"> 
-                      <a href="{{athenaLink}}" target="_blank"><button class="btn btn-primary">Amazon Athena</button></a> </div>
+                      </div>
                       <div class="div-content"> 
     
                        <strong class="example">b) Run Athena Queries</strong></div>
@@ -610,8 +610,8 @@ md-steppers {
                         GROUP BY products.product_category;</div></br> </br> 
 
 
-                    <!-- <button class="btn btn-primary step-btn">Register Tables in Athena For Ad-Hoc Analysis</button> -->
-                    &nbsp;&nbsp;<button class="btn btn-primary step-btn" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
+                    <a href="{{athenaLink}}" target="_blank"><button class="btn btn-primary step-btn">Visit Amazon Athena</button></a> 
+                    &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
                     </div>
                 </md-content>
               </md-tab>
