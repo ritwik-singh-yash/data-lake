@@ -5,6 +5,7 @@ $scope.amazonQuickSightUrl = "https://"+_config.region.Value+".quicksight.aws.am
 var obj = {
   [userPoolProviderName]: localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken")
 };
+$scope.glueConsoleUrl = "https://"+_config.region.Value+".console.aws.amazon.com/glue/home"
 $scope.elasticDashboardUrl = 'https://'+_config.StreamMetaDataURL
 console.log('elasticDashboardUrl',$scope.elasticDashboardUrl)
 console.log('localStorage.getIte',localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken"))
@@ -15,6 +16,7 @@ var transform_redshift_crawler_lambda_api = lambda_api + "run_crawler";
 var transform_crawler_lambda_api = lambda_api + "transformcrawler";
 var redshift_raw_to_transform_ETL = lambda_api + "transformedredshift";
 var redshift_spectrum = lambda_api + "redshift";
+var copy_incremental_data = lambda_api + "add-incremental_data";
 var props = lambda_api + "prop";
 $scope.kibanaUrl = 'https://'+_config.KibanaURL
 $scope.athenaLink = "https://"+_config.region.Value+".console.aws.amazon.com/athena/home?region="+_config.region.Value+"#query"
@@ -22,6 +24,8 @@ $scope.isRedshiftNext = true
 $scope.isRedshifttransform = true
 $scope.isQuickSight = true
 $scope.enableStep3ANext = true
+$scope.enableStep5ANext = true
+$scope.enableStep5BNext = true
 $scope.enableStep3BNext = true
 $scope.enableStep3CNext =  true
 AWS.config.region = _config.region.Value
@@ -37,6 +41,7 @@ $scope.selected = 0
 $scope.subSelected = 0
 $scope.subRedshift = 0
 $scope.subQuickSight = 0
+$scope.subIncremental = 0
 var streamName =_config.firehose1,
   streamType = "firehose",
   rate = 500,
@@ -60,6 +65,11 @@ $scope.subStepper = {
   stepB: false,
   stepC: false
 }
+$scope.incStepper = {
+  stepA: false,
+  stepB: false
+}
+
 $scope.redshiftStepper = {
   stepA: false,
   stepB: false
@@ -67,6 +77,25 @@ $scope.redshiftStepper = {
 $scope.quickSightStepper = {
   stepA: false,
   stepB: false
+}
+
+$scope.btn = {
+  step1: false,
+  step2: false,
+  step3A: false,
+  step3B: false,
+  step3C: false,
+  step4: false,
+  step5: false,
+  step6: false,
+  step7A: false,
+  step7B: false,
+  step7C: false,
+  step8: false,
+  step9A: false,
+  step9B: false,
+  step10: false
+
 }
 $scope.btn1 = false
 $scope.btn2 = false
@@ -76,6 +105,8 @@ console.log('aws', AWS)
 
 $scope.nextStep = function(type,step) {
   console.log('nextStep', type, step)
+ $scope.crawlerState = ''
+ $scope.jobState = ''
   if(type == 'outer') {
     $scope.selected = step
       if(step == 2) {
@@ -95,9 +126,16 @@ $scope.nextStep = function(type,step) {
      console.log('else in')
     $scope.subSelected = step
   }
+  if (type == 'increment') {
+     console.log('else in')
+    $scope.subIncremental = step
+    $scope.isIncrementSet = false
+  }
 }
 
+
 $scope.createProp = function() {
+  $scope.btn.step1 = true
   $http({
     method: 'GET',
     url: props,
@@ -108,12 +146,15 @@ $scope.createProp = function() {
     $scope.selected = 1
     console.log('properties', response)
   }, function myError(response) {
+    $scope.btn.step1 = false
     console.log('response', response)
   });
 }
 
 $scope.createCrawler = function() {
   console.log('createCrawler')
+  $scope.isIncrementSet = false
+  $scope.btn.step2 = true
   $scope.show.loader = true
   $scope.btn1 = true
   $http({
@@ -133,6 +174,7 @@ $scope.createCrawler = function() {
   }, function myError(response) {
     console.log('response', response)
     $scope.show.loader = false
+    $scope.btn.step2 = false
     $scope.crawlerState = 'Identity token has expired'
   });
 }
@@ -168,6 +210,8 @@ $scope.getCrawlerStatus = function() {
       if (err) console.log(err, err.stack); // an error occurred
       else {
         console.log('getCrawler', data);
+        console.log('step5 condition', $scope.selected,$scope.subIncremental,$scope.isIncrementSet);
+        console.log('step5 data', $scope.selected == 4 &&  $scope.subIncremental == 1 && $scope.isIncrementSet == false);
         var status = JSON.stringify(data);
         var obj1 = obj.Crawler;
         $scope.checkCrawlerStatus = false
@@ -188,6 +232,15 @@ $scope.getCrawlerStatus = function() {
           if ($scope.selected == 8 && $scope.subQuickSight == 0) {
             $scope.subQuickSight = 1
            } 
+           if($scope.selected == 4 &&  $scope.subIncremental == 1 && $scope.isIncrementSet == false) {
+            console.log('crawler status')
+            $scope.show.loader = true
+             $scope.createETL()
+           }
+           if($scope.selected == 4 &&  $scope.subIncremental == 1 && $scope.isIncrementSet == true) {
+            $scope.enableStep5BNext = false
+           }
+
           if ($scope.selected == 6 && $scope.subRedshift == 0) {
             $scope.subRedshift = 1
            } else if ($scope.selected == 6 && $scope.subRedshift == 1) {
@@ -210,9 +263,12 @@ $scope.getCrawlerStatus = function() {
   });
 }
 $scope.jobsArr = []
+$scope.disableIncBtn = function() {
+  $scope.btn.step5 = true
+}
 /*Step 2 start*/
 $scope.createETL = function() {
-
+  $scope.btn.step3A = true
   $scope.jobsArr = []
   $scope.show.loader = true
   var raw_to_transform_ETL = lambda_api + "rawtransformetl";
@@ -225,12 +281,15 @@ $scope.createETL = function() {
   }).then(function mySuccess(res) {
     console.log('resu data', res.data)
     var response = res.data
+    $scope.isIncrementSet = true
     response.job_name_and_id.isSucceeded = false
     $scope.jobsArr.push(response.job_name_and_id)
-    $scope.stopJobStatus = $interval($scope.getJobStatus, 120000);
+    $scope.stopJobStatus = $interval($scope.getJobStatus, 60000);
     console.log(' success result', response)
     console.log(' $scope.jobsArr', $scope.jobsArr)
   }, function myError(jqXHR, textStatus, errorThrown) {
+    $scope.btn.step3A = false
+    $scope.show.loader = false
     console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
     console.error('Response: ', jqXHR.responseText);
   });
@@ -329,6 +388,9 @@ $scope.getJobStatus = function() {
         if($scope.selected == 8 &&  $scope.subQuickSight == 0) {
           $scope.isQuickSight = false
         }
+         if($scope.selected == 4 && $scope.subIncremental == 1) {
+          $scope.createTrCrawler()
+        }
         $scope.$apply()
         toastr.success('Jobs Created successfully!')
       }
@@ -340,6 +402,7 @@ $scope.getJobStatus = function() {
 $scope.redShiftJobArr = []
 $scope.createRedshiftJob = function() {
   $scope.jobsArr = []
+  $scope.btn.step3C = true
   $scope.show.loader = true
   $http({
     method: 'GET',
@@ -353,17 +416,9 @@ $scope.createRedshiftJob = function() {
     var response = res.data
     response.job_name_and_id.isSucceeded = false
     $scope.jobsArr.push(response.job_name_and_id)
-   /* $scope.jobsArr = [{
-      Jobname: res.data.customer_job[0],
-      jobID: res.data.customer_job[1],
-      isSucceeded: false
-    }, {
-      Jobname: res.data.order_job[0],
-      jobID: res.data.order_job[1],
-      isSucceeded: false
-    }]
-    $scope.stopJobStatus = $interval($scope.getJobStatus, 120000);*/
   }, function myError(jqXHR, textStatus, errorThrown) {
+    $scope.btn.step3C = false
+    $scope.show.loader = false
     console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
     console.error('Response: ', jqXHR);
   });
@@ -380,13 +435,14 @@ $scope.createRedShiftSpectrum = function() {
     var response = res.data
     response.job_name_and_id.isSucceeded = false
     $scope.jobsArr.push(response.job_name_and_id)
-    $scope.stopJobStatus = $interval($scope.getJobStatus, 120000);
+    $scope.stopJobStatus = $interval($scope.getJobStatus, 60000);
   }, function myError(jqXHR, textStatus, errorThrown) {
     console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
     console.error('Response: ', jqXHR.responseText);
   });
 }
 $scope.createTrCrawler = function() {
+  $scope.btn.step3B = true
   $scope.jobsArr = []
   console.log('createTrCrawler')
   $scope.show.loader = true
@@ -399,12 +455,14 @@ $scope.createTrCrawler = function() {
   }).then(function mySuccess(response) {
     var res1 = JSON.stringify(response);
     $scope.crawler = response.data['Crawler_Name']
+    $scope.isIncrementSet = true
     console.log('crawler name', res1)
     $scope.stopTime = $interval($scope.getCrawlerStatus, 10000);
     console.log('Response received from API: ', response);
   }, function myError(response) {
     console.log('response', response)
     $scope.show.loader = false
+     $scope.btn.step3B = true
     $scope.crawlerState = 'Identity token has expired'
   });
 }
@@ -629,6 +687,7 @@ $scope.stopKinesisApp = function() {
 /*Step 7 start*/
  $scope.runRedshiftAnalytics = function() {
    $scope.show.loader = true
+   $scope.btn.step7A = true
     var run_analytics_queries_job = lambda_api + "redshiftanalyticsqueries";
     $http({
       method: 'GET',
@@ -642,10 +701,12 @@ $scope.stopKinesisApp = function() {
       var response = res.data
       response.job_name_and_id.isSucceeded = false
       $scope.jobsArr.push(response.job_name_and_id)
-      $scope.stopJobStatus = $interval($scope.getJobStatus, 120000);
+      $scope.stopJobStatus = $interval($scope.getJobStatus, 60000);
       console.log(' success result', response)
       console.log(' $scope.jobsArr', $scope.jobsArr)
     }, function myError(jqXHR, textStatus, errorThrown) {
+      $scope.btn.step7A = false
+      $scope.show.loader = false
       console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
       console.error('Response: ', jqXHR.responseText);
     });
@@ -678,6 +739,7 @@ $scope.stopKinesisApp = function() {
 
  $scope.redShiftToTransformCopy = function() {
    $scope.show.loader = true
+   $scope.btn.step7B = true
     var redshift_transform_copy = lambda_api + "redshifttotransformcopy";
     $http({
       method: 'GET',
@@ -691,10 +753,12 @@ $scope.stopKinesisApp = function() {
       var response = res.data
       response.job_name_and_id.isSucceeded = false
       $scope.jobsArr.push(response.job_name_and_id)
-      $scope.stopJobStatus = $interval($scope.getJobStatus, 120000);
+      $scope.stopJobStatus = $interval($scope.getJobStatus, 60000);
       console.log(' success result', response)
       console.log(' $scope.jobsArr', $scope.jobsArr)
     }, function myError(jqXHR, textStatus, errorThrown) {
+      $scope.btn.step7B = false
+      $scope.show.loader = false
       console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
       console.error('Response: ', jqXHR.responseText);
     });
@@ -725,6 +789,7 @@ $scope.stopKinesisApp = function() {
 /*Step 9 start*/
  $scope.runTransformToPublishJob = function() {
    $scope.show.loader = true
+   $scope.btn.step9A = true
     var run_transform_to_publish_job = lambda_api + "run_transform_to_publish_job";
     $http({
       method: 'GET',
@@ -738,10 +803,12 @@ $scope.stopKinesisApp = function() {
       var response = res.data
       response.job_name_and_id.isSucceeded = false
       $scope.jobsArr.push(response.job_name_and_id)
-      $scope.stopJobStatus = $interval($scope.getJobStatus, 120000);
+      $scope.stopJobStatus = $interval($scope.getJobStatus, 60000);
       console.log(' success result', response)
       console.log(' $scope.jobsArr', $scope.jobsArr)
     }, function myError(jqXHR, textStatus, errorThrown) {
+      $scope.show.loader = false
+      $scope.btn.step9A = false
       console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
       console.error('Response: ', jqXHR.responseText);
     });
@@ -763,6 +830,30 @@ $scope.stopKinesisApp = function() {
     //$scope.getCrawlerStatus()
     $scope.stopTime = $interval($scope.getCrawlerStatus, 10000);
     console.log('Response received from API: ', response);
+  }, function myError(response) {
+    console.log('response', response)
+    $scope.show.loader = false
+    $scope.crawlerState = 'Identity token has expired'
+  });
+ }
+
+ $scope.loadIncrementaldata = function() {
+   $scope.show.loader = true
+   $http({
+    method: 'GET',
+    url: copy_incremental_data,
+    headers: {
+      'Authorization': localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken")
+    }
+  }).then(function mySuccess(response) {
+    $scope.checkCrawlerStatus = true
+    var res1 = JSON.stringify(response);
+    $scope.incStatus = response.data['file_upload']
+    console.log('crawler name', $scope.incStatus)
+    $scope.show.loader = false
+    if($scope.incStatus) {
+      $scope.enableStep5ANext = false
+    }
   }, function myError(response) {
     console.log('response', response)
     $scope.show.loader = false
