@@ -199,7 +199,7 @@ md-steppers {
                     <div class="div-content" style="text-align: center;">
                       <img src="../../static/diagrams/getting-started.png" class="stepper-image-small"/>
                     </div>
-                    <button class="btn btn-primary step-btn" ng-click="createProp()">Begin walk-through</button>
+                    <button class="btn btn-primary step-btn" ng-disabled="btn.step1" ng-click="createProp()">Begin walk-through</button>
                   </div>
                 </md-content>
               </md-tab>
@@ -230,7 +230,7 @@ md-steppers {
                     </div>
                     <div class="div-content" style="text-align: center;">
                        <img src="../../static/diagrams/QuickStart_Step2.png" class="stepper-image-small"/></div>
-                    <button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn1">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
+                    <button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn.step2">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
                             <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
                 </md-content>
@@ -247,12 +247,12 @@ md-steppers {
                             <strong class="example">Creation of Transformed Datasets </strong>
                             </div>
                              <div class="div-content">
-                            AWS Glue creates four ETL Jobs for the creation of Transformed dataset and writes it in S3 Bucket named TRANSFORMED_BUCKET_DB partition by year, month & day.
+                            AWS Glue creates four ETL Jobs for the creation of Transformed dataset and writes it in S3 Bucket named TRANSFORMED BUCKET partition by year, month & day.
                             </div>
                             <div class="div-content" style="text-align: center;">
                               <img src="../../static/diagrams/quickstart_step3a.png" class="stepper-image-small"/>
                             </div>
-                            <button class="btn btn-primary step-btn" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
+                            <button class="btn btn-primary step-btn" ng-disabled="btn.step3A" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
                            <br/><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            </div>
@@ -271,7 +271,7 @@ md-steppers {
                           <div class="div-content" style="text-align: center;"> 
                            <img src="../../static/diagrams/quickstart_Step3b.png" class="stepper-image-small"/>
                            </div>
-                          <button class="btn btn-primary step-btn" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/>
+                          <button class="btn btn-primary step-btn" ng-disabled="btn.step3B" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/>
                           <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
                         </md-content>
@@ -301,7 +301,7 @@ md-steppers {
                             <div class="div-content" style="text-align: center;"> 
                               <img src="../../static/diagrams/quickstart_step3c.png" class="stepper-image-small"/>
                             </div>
-                          <button class="btn btn-primary step-btn" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/>
+                          <button class="btn btn-primary step-btn" ng-disabled="btn.step3C" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/>
                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                           </div>
                       </md-content>
@@ -389,35 +389,71 @@ md-steppers {
               </md-tab>
               <md-tab label="Incremental data" ng-disabled="stepper.step5">
                 <md-content class="md-padding">
-                  <md-content>
-                    <div class="step-content">
-                    <h5 class="md-display-0">Step 5: Incremental data</h5>
-                    <div class="div-content">  
-                      Incremental load is defined as the activity of loading new or updated columns in the table.
-                      AWS Glue detects schema changes in the data and adapts it.
-                      Till  now we were not having the e-mail address of the customers in the Customer data. Now we add the column in the customer table holding the email address of the customers. 
-                      This is because email consistently out performs other marketing activities. Actually, email  converts at nearly twice the normal in our experience – partly because they are regular and satisfied customers. Its certainly a lot cheaper than many of the activities retailers pursue.
-                    </div>  
-                    <div class="div-content">  
-                      Email is a critical piece of the marketing puzzle for e-Commerce businesses that can increase e-Commerce Conversions by Using Customer Data
-                    </div>  
-                      <div class="div-content">  
-                        <strong class="example">1. Using Past Online Purchases :</strong> Customers past behaviour is a good indicator of future behaviour. Past purchases inform you about the styles, brands, and products your customers are interested in. Sending the mail to the customer for the products based on customer interests can help in the increase of your business.
-                      </div>  
-                      <div class="div-content">     
-                        <strong class="example">2. Products Viewed :</strong> Viewing a product, especially multiple times, indicates interest. But, this data often goes unused in e-Commerce email marketing. Ideal use of this data is like :
+                 <md-tabs id="innerTabCustom" md-dynamic-height md-border-bottom  ng-init="subIncremental = 0;" md-selected="subIncremental">
+                    <md-tab label="Step A" ng-disabled="incStepper.stepA">
+                      <md-content style="overflow:hidden;">
+                       <h5 class="md-display-0">Load Incremental Data </h5>
+                      <div class="div-content">
+                        Incremental load is defined as the activity of loading new or updated columns in the table.
+                        AWS Glue detects schema changes in the data and adapts it.
                         </div>
-                        <div class="div-content">  
-                          1. After someone views a product but does not purchase it, send an email containing a buying guide to educate the potential customer about the item and provide the tools to evaluate it.</br></br>
-                          2. If the customer clicks on the buying guide, send a follow-up email to suggest urgency; for instance, a notification of a sale or limited inventory.
-                        </div>  
-                        <div class="div-content">  
-                        <strong class="example">3. Item left in Cart :</strong> Abandoned cart reminders probably are the most common way e-Commerce marketers use data to drive their email marketing programs. Limited inventory, a discount, and telling the customer you will remove the items from his cart soon are all ways to invoke sense of urgency.
+                        <div class="div-content">
+                        Till  now we were not having the stock quantity column in the Product catalog. Adding the new column to the product catalog named QuantityInstock which will be containing the information about the quantity of product available in the inventory.
+                       </div>
+                       <div class="div-content" style="text-align: center;">
+                       <div class="row">
+                       <div class="col-md-6">
+                          <img src="../../static/diagrams/prod1.png" class="stepper-image-small"/>
+                       </div>
+                       <div class="col-md-6">
+                        <img src="../../static/diagrams/prod2.png" class="stepper-image-small"/>
+                       </div>
+                       <div class="div-content">
+                         <img src="../../static/diagrams/awsLambda.png" class="stepper-image-small"/>
+                       </div>
+                       </div>
+                       <div class="div-content">
+                       The button given below will help you to discover the incremental data stored at user location. The button will trigger the lambda function which will copy the data stored at user location to the Raw Bucket in Products Folder.
+                       </div>
                         </div>
-                        <br/>
-                        <button class="btn btn-primary step-btn" ng-click="nextStep('outer', 5)" ng-disabled="btn1">Next</button>
-                      </div>
-                  </md-content>
+                        <button class="btn btn-primary step-btn" ng-click="loadIncrementaldata()">Load Incremental Data</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('increment', 1)" ng-disabled="enableStep5ANext">Next</button>
+
+                      </md-content>
+                    </md-tab>
+                    <md-tab label="Step B" ng-disabled="incStepper.stepA">
+                      <md-content style="overflow:hidden;">
+                        <h5 class="md-display-0">Process Incremental Data</h5>
+                        <div class=div-content>
+                         Quantity of Product  in stock is required for inventory management. Inventory management entails taking steps to ensure that businesses maintain an optimum quantity of required resources such that their operations are executed seamlessly without a shortage or overabundance of resources. It is also crucial for ecommerce businesses. It enables the business to function without any time lag.
+                        </div>
+                        <div class="div-content">
+                        <strong> The benefits of inventory management for ecommerce businesses include: </strong>
+                        </div>
+                        <div class="div-content">
+                          1. Balanced Supply and Demand - Inventory management allows for swift replenishment of utilized resources and products, and clearance of seasonal goods, so that their storage does not take up useful space and other resources.
+                          </div>
+                          <div class="div-content">
+                          2. Backup Stock - In addition to utilizing resources to their optimum capacity, inventory management also ensures that backup, or buffer, stock is always available in case of any unexpected delays or an increase in demand. This is crucial for ecommerce businesses as it prevents them from losing precious sales or experiencing delivery delays which could result in the loss of customers.
+                          </div>
+                          <div class="div-content">
+                            The button given below will trigger the Glue crawler to discover the meta data associated to Incremental dataset and run the ETL job which will process the data for the creation of Transformed Incremental dataset  and loading it in S3 Bucket named TRANSFORMED_BUCKET_DB partition by year, month & day.
+                          </div>
+                          <div class="div-content">
+                            <img src="../../static/diagrams/glueData.png" style="margin-left:5%;" class="stepper-image-small"/>
+                          </div>
+                          <div class="div-content">
+                            <button class="btn btn-primary step-btn" ng-disabled="btn.step5" ng-click="createCrawler();disableIncBtn()">Process Incremental Data</button>
+                          </div>
+                          <div class="div-content" style="margin-left:20%;">
+                             To visit the Glue console to check the updated schema, you can click on the following button :
+                          </div><br/>
+                           <a href="{{glueConsoleUrl}}" target="_blank"><button class="btn btn-primary step-btn">                     Visit Glue Console</button></a><button class="btn btn-primary" ng-click="nextStep('outer', 5)" ng-disabled="enableStep5BNext" style="margin-left:2%;">Next</button>
+
+                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
+                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
+                      </md-content>
+                    </md-tab>
+                  </md-tabs>    
                 </md-content>
               </md-tab>
               <md-tab label="ElasticSearch" ng-disabled="stepper.step6">
@@ -452,7 +488,7 @@ md-steppers {
                             </div>
                             </div>
                     <a href="{{kibanaUrl}}" target="_blank"><button class="btn btn-primary step-btn">Visit Elasticsearch UI</button></a>
-                    <button class="btn btn-primary" ng-click="nextStep('outer', 6)" ng-disabled="btn1">Next</button>
+                    <button class="btn btn-primary" ng-click="nextStep('outer', 6)">Next</button>
                     </div>
                   </md-content>
                 </md-content>
@@ -526,7 +562,7 @@ md-steppers {
                                     AWS Glue Crawler will discover the metadata for the table generated from the queries.
                                     </div>
 
-                                 <button class="btn btn-primary step-btn" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
+                                 <button class="btn btn-primary step-btn" ng-disabled="btn.step7A" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
                                  <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                                  <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
@@ -545,7 +581,7 @@ md-steppers {
                              <img src="../../static/diagrams/quickstart_step_7b.png" class="stepper-image-small"/>
                              </div>
                           <button
-                           class="btn btn-primary step-btn" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
+                           class="btn btn-primary step-btn" ng-disabled="btn.step7B" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
                           &nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
@@ -576,7 +612,7 @@ md-steppers {
                       <div class="div-content"> 
     
                        <strong class="example">b) Run Athena Queries</strong></div>
-                      a. In Amazon Athena Console to write queries. First, Select the athena_yash_db Database in the dropdown menu.</br> 
+                      a. In Amazon Athena Console to write queries. First, Select the yash-quickstart-datalake-transformed-bucket-db Database in the dropdown menu.</br> 
 
     
                         <strong class="example">Example 1 :  Hour Of The Day</strong></br> 
@@ -608,10 +644,18 @@ md-steppers {
                         JOIN orders </br>
                           ON orders.sku = products.sku </br>
                         GROUP BY products.product_category;</div></br> </br> 
-
+                        <div class="div-content">
+                            <strong>Note :</strong> Data exploration can be done on the Incremental Data.
+                        </div>
+                        <div class="query">
+                            SELECT sku, product_category  </br> 
+                            FROM products </br> 
+                            WHERE quantityinstock < 450  </br> 
+                            ORDER BY product_category ;
+                        </div></br> </br>
 
                     <a href="{{athenaLink}}" target="_blank"><button class="btn btn-primary step-btn">Visit Amazon Athena</button></a> 
-                    &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 8)" ng-disabled="btn1">Next</button>
+                    &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 8)">Next</button>
                     </div>
                 </md-content>
               </md-tab>
@@ -630,7 +674,7 @@ md-steppers {
                             <div class="div-content" style="text-align: center;"> 
                             <img src="../../static/diagrams/QuickstartWizard_step_9a.png" class="stepper-image"/>
                             </div>
-                           <button class="btn btn-primary step-btn" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
+                           <button class="btn btn-primary step-btn" ng-disabled="btn.step9A" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
                            <button class="btn btn-primary" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
