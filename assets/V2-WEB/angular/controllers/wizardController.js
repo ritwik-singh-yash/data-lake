@@ -17,6 +17,7 @@ var transform_crawler_lambda_api = lambda_api + "transformcrawler";
 var redshift_raw_to_transform_ETL = lambda_api + "transformedredshift";
 var redshift_spectrum = lambda_api + "redshift";
 var copy_incremental_data = lambda_api + "add-incremental_data";
+var quicksight_signin = lambda_api + "getSignInToken"
 var props = lambda_api + "prop";
 $scope.kibanaUrl = 'https://'+_config.KibanaURL
 $scope.athenaLink = "https://"+_config.region.Value+".console.aws.amazon.com/athena/home?region="+_config.region.Value+"#query"
@@ -101,7 +102,6 @@ $scope.btn1 = false
 $scope.btn2 = false
 $scope.enableStreamNext = true
 $scope.enableStartStream = true
-console.log('aws', AWS)
 
 $scope.nextStep = function(type,step) {
   console.log('nextStep', type, step)
@@ -466,11 +466,15 @@ $scope.createTrCrawler = function() {
     $scope.crawlerState = 'Identity token has expired'
   });
 }
+ $scope.dataReady = false
 $scope.startDataStream = function() {
   console.log("Inside STart");
   $scope.enableStartStream = false
-  //$scope.show.loader = true
-  $scope.show_text = true
+   $scope.show_text = true
+  setTimeout(function(){ 
+    $scope.dataReady = true 
+    $scope.$apply()
+  }, 240000);
   rate = 500;
   streamType = "firehose";
   var params = {
@@ -489,6 +493,9 @@ $scope.startDataStream = function() {
       region: _config.region.Value
     });
   })
+  setInterval(function(){ 
+    $scope.show_text = true
+  }, 30000);
   // $scope.createData()
   $scope.sendDataHandle = $interval($scope.createData, 5000);
 }
@@ -561,9 +568,10 @@ function sendToKinesis(data) {
 var kinesisApplication1Name = '';
 var kinesisApplication2Name = '';
 var kinesisApp1Id;
-
+$scope.stopDataGeneration = true
 $scope.appInfo = [_config.kinesisapplicationname1,_config.kinesisapplicationname2]
 $scope.startKinesisApp = function() {
+  $scope.stopDataGeneration = false
   var params = {
     IdentityPoolId: _config.identityPoolId,
     Logins: obj
@@ -860,24 +868,55 @@ $scope.stopKinesisApp = function() {
     $scope.crawlerState = 'Identity token has expired'
   });
  }
-  /*$scope.refreshToken = function() {
-      AWS.config.credentials.get(function(err){
-       if (err) {
-      alert(err);
-      }
-      else{
-      AWS.config.update({region:_config.region.Value});
-      AWS.config.credentials.refresh((error) => {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('inside refresh token ');
-            }
-        });
-      }
-    }); 
-  }*/
   
+  $scope.getQuickSightSignInUrl = function() {
+   var thisUrlEncoded = encodeURIComponent("https://"+window.location.hostname);
+   var quicksightUrlEncoded = encodeURIComponent("https://quicksight.aws.amazon.com/");
+   var params = {
+      IdentityPoolId: _config.identityPoolId,
+      Logins: obj
+    };
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: _config.identityPoolId, // your identity pool id here
+      Logins: obj
+    });
+    AWS.config.update({
+      region: _config.region.Value
+    });
+    AWS.config.credentials.get(function(err){
+         if (err) {
+        alert(err);
+        }
+        else{
+    var creds = {
+     "sessionId":AWS.config.credentials.accessKeyId,
+     "sessionKey":AWS.config.credentials.secretAccessKey,
+     "sessionToken":AWS.config.credentials.sessionToken
+                  };
+      
+     var credsEncoded = encodeURIComponent(JSON.stringify(creds));
+     var postData = {
+        url: "https://signin.aws.amazon.com/federation?Action=getSigninToken&SessionDuration=43200&Session="+credsEncoded
+     }
+    $http({
+      method: 'POST',
+      url: quicksight_signin,
+      data: postData,
+      headers: {
+        'Authorization': localStorage.getItem("CognitoIdentityServiceProvider."+clientAppId+"."+localStorage.getItem('username')+".idToken")
+      }
+    }).then(function mySuccess(response) {
+      var res1 = JSON.stringify(response);
+      $scope.signInToken = response.data['SigninToken']
+      $scope.quickSightSSO = "https://signin.aws.amazon.com/federation?Action=login&Issuer="+thisUrlEncoded+"&Destination="+quicksightUrlEncoded+"&SigninToken="+$scope.signInToken;
+
+    }, function myError(response) {
+    });
+     
+    } 
+      });
+  }
+   $scope.getQuickSightSignInUrl()
    $scope.refreshToken = function() {
     var encryptedAES = localStorage.getItem('secretKey')
     var decryptedBytes = window.CryptoJS.AES.decrypt(encryptedAES, "My Secret Passphrase");
@@ -942,6 +981,8 @@ $scope.stopKinesisApp = function() {
             }
        });
   }
+
+ 
   $scope.resfresh = $interval($scope.refreshToken, 900000);
 })
 
