@@ -231,6 +231,7 @@ md-steppers {
                     <div class="div-content" style="text-align: center;">
                        <img src="../../static/diagrams/QuickStart_Step2.png" class="stepper-image-small"/></div>
                     <button class="btn btn-primary step-btn" ng-click="createCrawler()" ng-disabled="btn.step2">Discover RAW Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 2)" ng-disabled="enableStep2Next">Next</button><br/><br/><br/>
+                    <div style="text-align: center;margin-left: 13%;" ng-if="btn.step2"><strong>This step will take Approximately 2 minutes to execute</strong></div><br/>
                             <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
                 </md-content>
@@ -254,6 +255,7 @@ md-steppers {
                             </div>
                             <button class="btn btn-primary step-btn" ng-disabled="btn.step3A" ng-click="createETL()">Create Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 1)" ng-disabled="enableStep3ANext">Next</button>
                            <br/><br/>
+                            <div style="text-align: center;margin-left: 13%;" ng-if="btn.step3A"><strong>This step will take Approximately 10 minutes to execute</strong></div><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            </div>
                        </div>
@@ -272,6 +274,7 @@ md-steppers {
                            <img src="../../static/diagrams/quickstart_Step3b.png" class="stepper-image-small"/>
                            </div>
                           <button class="btn btn-primary step-btn" ng-disabled="btn.step3B" ng-click="createTrCrawler()">Discover Transformed Datasets</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('inner', 2)" ng-disabled="enableStep3BNext">Next</button><br/><br/>
+                          <div style="text-align: center;margin-left: 13%" ng-if="btn.step3B"><strong>This step will take Approximately 1 minutes to execute</strong></div><br/>
                           <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                           </div>
                         </md-content>
@@ -302,6 +305,7 @@ md-steppers {
                               <img src="../../static/diagrams/quickstart_step3c.png" class="stepper-image-small"/>
                             </div>
                           <button class="btn btn-primary step-btn" ng-disabled="btn.step3C" ng-click="createRedshiftJob();createRedShiftSpectrum();">Load & Register Transformed Dataset in Redshift</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 3)" ng-disabled="enableStep3CNext">Next</button><br/>
+                          <div style="text-align: center;margin-left: 13%;" ng-if="btn.step3C"><strong>This step will take Approximately 6 minutes to execute</strong></div><br/>
                           <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                           </div>
                       </md-content>
@@ -375,11 +379,11 @@ md-steppers {
                               <img src="../../static/diagrams/geo.png" class="stepper-image-small"/>
                               </div></br>
                               <div class="div-content"></div>
-                              <strong>Kibana URL: </strong><br/><a href="{{elasticDashboardUrl}}" target="_blank"><h6>{{elasticDashboardUrl}}</h6></a>
+                              <div ng-if="dataReady"><strong>Kibana URL: </strong><br/><a href="{{elasticDashboardUrl}}" target="_blank"><h6>{{elasticDashboardUrl}}</h6></a></div>
                               <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Stop Order Data Stream" to stop data generation</div></br>
                     <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
-                    <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="enableStartStream">Stop Order Data Stream</button>
-                    <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
+                     <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
+                    <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="stopDataGeneration">Stop Order Data Stream</button>
                     <button class="btn btn-primary" ng-click="nextStep('outer', 4)" ng-disabled="enableStreamNext">Next</button>
                     <br/><br/>
                     <div class="alert alert-info" ng-if="appStarted" style="width:fit-content"> <strong>{{appStarted}}</strong></div>
@@ -722,146 +726,146 @@ md-steppers {
                               b. Allow QuickSight to access the Published Dataset Bucket through the QuickSight UI.</br>
                               c. Follow the steps described below to create the following dashboards.</div></br>
                                <div class="bd-example">
-                      <div id="accordion" role="tablist">
-                        <div class="card">
-                          <div class="card-header" role="tab" id="headingOne">
-                            <h5 class="mb-0">
-                              <a data-toggle="collapse" href="#collapseOne" role="button" aria-expanded="true" aria-controls="collapseOne">
-                                Payment mode Distribution
-                              </a>
-                            </h5>
-                          </div>
-
-                          <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="card-body">
-                            <div style="padding:2%;">
-                             Payment mode distribution dataset consists of records with columns : payment_mode, number_of_orders</br>
-                              Use the following procedure to create the visualisation from it:</div>
-                                <div class="padding-all">1. Create Pie chart visual with the payment_mode as Value and number_of_orders
-                                as Color.</br>
-                                2. The Result will look like this :</div>
-                                <img src="../../static/diagrams/step10_1.png" class="padding-all"/>
-
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card">
-                          <div class="card-header" role="tab" id="headingTwo">
-                            <h5 class="mb-0">
-                              <a class="collapsed" data-toggle="collapse" href="#collapseTwo" role="button" aria-expanded="false" aria-controls="collapseTwo">
-                                Age and Gender wise expenditure distribution
-                              </a>
-                            </h5>
-                          </div>
-                          <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
-                            <div class="card-body">
-                            <div style="padding:2%;">
-                              Age and Gender wise expenditure distribution dataset consists of records with columns : customer_id, gender, age_grp_category, expenditure</br>
-                              Use the following procedure to create the visualisation from it:
+                          <div id="accordion" role="tablist">
+                            <div class="card">
+                              <div class="card-header" role="tab" id="headingOne">
+                                <h5 class="mb-0">
+                                  <a data-toggle="collapse" href="#collapseOne" role="button" aria-expanded="true" aria-controls="collapseOne">
+                                    Payment mode Distribution
+                                  </a>
+                                </h5>
                               </div>
-                              <div class="padding-all">1. Create Vertical Bar Chart visual with expenditure as value and age_ grp_category on X-axis and gender as color</br>
-                                2. Change aggregation method from SUM to AVERAGE on the expenditure column.</br>
-                                3. The Result will look like this :</div>
-                                <img src="../../static/diagrams/step10_7.png"/></br>
 
+                              <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                <div style="padding:2%;">
+                                 Payment mode distribution dataset consists of records with columns : payment_mode, number_of_orders</br>
+                                  Use the following procedure to create the visualisation from it:</div>
+                                    <div class="padding-all">1. Create Pie chart visual with the payment_mode as Value and number_of_orders
+                                    as Color.</br>
+                                    2. The Result will look like this :</div>
+                                    <img src="../../static/diagrams/step10_1.png" class="padding-all"/>
+
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card">
+                              <div class="card-header" role="tab" id="headingTwo">
+                                <h5 class="mb-0">
+                                  <a class="collapsed" data-toggle="collapse" href="#collapseTwo" role="button" aria-expanded="false" aria-controls="collapseTwo">
+                                    Age and Gender wise expenditure distribution
+                                  </a>
+                                </h5>
+                              </div>
+                              <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo" data-parent="#accordion">
+                                <div class="card-body">
+                                <div style="padding:2%;">
+                                  Age and Gender wise expenditure distribution dataset consists of records with columns : customer_id, gender, age_grp_category, expenditure</br>
+                                  Use the following procedure to create the visualisation from it:
+                                  </div>
+                                  <div class="padding-all">1. Create Vertical Bar Chart visual with expenditure as value and age_ grp_category on X-axis and gender as color</br>
+                                    2. Change aggregation method from SUM to AVERAGE on the expenditure column.</br>
+                                    3. The Result will look like this :</div>
+                                    <img src="../../static/diagrams/step10_7.png"/></br>
+
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card">
+                              <div class="card-header" role="tab" id="headingThree">
+                                <h5 class="mb-0">
+                                  <a class="collapsed" data-toggle="collapse" href="#collapseThree" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                    Order Distribution by Day of Week
+                                  </a>
+                                </h5>
+                              </div>
+                              <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                                <div class="card-body">
+                                <div style="padding:2%;">
+                                  Day of Week dataset consists of records with columns : day_of_week, order_distribution</br>
+
+                                  Use the following procedure to create the visualisation from it:
+                                  </div></br>
+                                  <div class="padding-all">
+                                    1. Create Cluster Bar Combo Chart visual with  day_of_week as X axis and </br>
+                                    order_distribution as Bars and Lines.</br>
+                                    2. The Result will look like this :</div>
+                                    <img src="../../static/diagrams/step10_3.png" class="padding-all"/></br>
+                                </div>
+                              </div>
+                            </div>
+                             <div class="card">
+                              <div class="card-header" role="tab" id="headingThree">
+                                <h5 class="mb-0">
+                                  <a class="collapsed" data-toggle="collapse" href="#collapseFour" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                    Top 10 Big Spenders
+                                  </a>
+                                </h5>
+                              </div>
+                              <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                                <div class="card-body">
+                                <div style="padding:2%;">
+                                  Big Spenders dataset consists of records with columns : customer_name, total_amt_spent, number_of_orders</br>
+
+                                  Use the following procedure to create the visualisation from it:</br></div>
+                                    <div class="padding-all">1. Create Table visual with  customer_name as Group by and 
+                                    total_amt_spent as Value.</br>
+                                    2. Use Sort to arrange the total_amt_spent in decreasing order.</br>
+                                    3. The Result will look like this :</div>
+                                    <img src="../../static/diagrams/step10_6.png" class="padding-all"/></br>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card">
+                              <div class="card-header" role="tab" id="headingThree">
+                                <h5 class="mb-0">
+                                  <a class="collapsed" data-toggle="collapse" href="#collapseFive" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                    Product category distribution
+                                  </a>
+                                </h5>
+                              </div>
+                              <div id="collapseFive" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                                <div class="card-body">
+                                <div style="padding:2%;">
+                                  Product category dataset consists of records with columns : product_category, gender, 
+                                  number_of_orders</br>
+
+                                  Use the following procedure to create the visualisation from it:</br></div>
+                                    <div class="padding-all">1. Create Horizontal Bar Chart visual with number_of_orders as value and 
+                                    product_category on Y-axis and gender as Color</br>
+                                    2. Use aggregation method SUM on the number_of_orders column.</br>
+                                    3. The Result will look like this :</div>
+                                    <img src="../../static/diagrams/step10_4.png" class="padding-all"/></br>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card">
+                              <div class="card-header" role="tab" id="headingThree">
+                                <h5 class="mb-0">
+                                  <a class="collapsed" data-toggle="collapse" href="#collapseSix" role="button" aria-expanded="false" aria-controls="collapseThree">
+                                    State wise Order distribution
+                                  </a>
+                                </h5>
+                              </div>
+                              <div id="collapseSix" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
+                                <div class="card-body">
+                                <div style="padding:2%;">
+                                  State wise order distribution dataset consists of records with columns : state, gender, 
+                                  number_of_orders</br>
+
+                                  Use the following procedure to create the visualisation from it:</br></div>
+                                   <div class="padding-all"> 1. Create Vertical Stacked Bar Chart visual with number_of_orders as value and 
+                                    state on X-axis and gender as color</br>
+                                    2. Use aggregation method SUM on the number_of_orders column.</br>
+                                    3. The Result will look like this :</div></br>
+
+                                    <img src="../../static/diagrams/step10_5.png" class="padding-all"/></br></br>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div class="card">
-                          <div class="card-header" role="tab" id="headingThree">
-                            <h5 class="mb-0">
-                              <a class="collapsed" data-toggle="collapse" href="#collapseThree" role="button" aria-expanded="false" aria-controls="collapseThree">
-                                Order Distribution by Day of Week
-                              </a>
-                            </h5>
-                          </div>
-                          <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
-                            <div class="card-body">
-                            <div style="padding:2%;">
-                              Day of Week dataset consists of records with columns : day_of_week, order_distribution</br>
-
-                              Use the following procedure to create the visualisation from it:
-                              </div></br>
-                              <div class="padding-all">
-                                1. Create Cluster Bar Combo Chart visual with  day_of_week as X axis and </br>
-                                order_distribution as Bars and Lines.</br>
-                                2. The Result will look like this :</div>
-                                <img src="../../static/diagrams/step10_3.png" class="padding-all"/></br>
-                            </div>
-                          </div>
-                        </div>
-                         <div class="card">
-                          <div class="card-header" role="tab" id="headingThree">
-                            <h5 class="mb-0">
-                              <a class="collapsed" data-toggle="collapse" href="#collapseFour" role="button" aria-expanded="false" aria-controls="collapseThree">
-                                Top 10 Big Spenders
-                              </a>
-                            </h5>
-                          </div>
-                          <div id="collapseFour" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
-                            <div class="card-body">
-                            <div style="padding:2%;">
-                              Big Spenders dataset consists of records with columns : customer_name, total_amt_spent, number_of_orders</br>
-
-                              Use the following procedure to create the visualisation from it:</br></div>
-                                <div class="padding-all">1. Create Table visual with  customer_name as Group by and 
-                                total_amt_spent as Value.</br>
-                                2. Use Sort to arrange the total_amt_spent in decreasing order.</br>
-                                3. The Result will look like this :</div>
-                                <img src="../../static/diagrams/step10_6.png" class="padding-all"/></br>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card">
-                          <div class="card-header" role="tab" id="headingThree">
-                            <h5 class="mb-0">
-                              <a class="collapsed" data-toggle="collapse" href="#collapseFive" role="button" aria-expanded="false" aria-controls="collapseThree">
-                                Product category distribution
-                              </a>
-                            </h5>
-                          </div>
-                          <div id="collapseFive" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
-                            <div class="card-body">
-                            <div style="padding:2%;">
-                              Product category dataset consists of records with columns : product_category, gender, 
-                              number_of_orders</br>
-
-                              Use the following procedure to create the visualisation from it:</br></div>
-                                <div class="padding-all">1. Create Horizontal Bar Chart visual with number_of_orders as value and 
-                                product_category on Y-axis and gender as Color</br>
-                                2. Use aggregation method SUM on the number_of_orders column.</br>
-                                3. The Result will look like this :</div>
-                                <img src="../../static/diagrams/step10_4.png" class="padding-all"/></br>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="card">
-                          <div class="card-header" role="tab" id="headingThree">
-                            <h5 class="mb-0">
-                              <a class="collapsed" data-toggle="collapse" href="#collapseSix" role="button" aria-expanded="false" aria-controls="collapseThree">
-                                State wise Order distribution
-                              </a>
-                            </h5>
-                          </div>
-                          <div id="collapseSix" class="collapse" role="tabpanel" aria-labelledby="headingThree" data-parent="#accordion">
-                            <div class="card-body">
-                            <div style="padding:2%;">
-                              State wise order distribution dataset consists of records with columns : state, gender, 
-                              number_of_orders</br>
-
-                              Use the following procedure to create the visualisation from it:</br></div>
-                               <div class="padding-all"> 1. Create Vertical Stacked Bar Chart visual with number_of_orders as value and 
-                                state on X-axis and gender as color</br>
-                                2. Use aggregation method SUM on the number_of_orders column.</br>
-                                3. The Result will look like this :</div></br>
-
-                                <img src="../../static/diagrams/step10_5.png" class="padding-all"/></br></br>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                                <a href="{{amazonQuickSightUrl}}" target="_blank"><button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button></a>
+                                <a href="{{quickSightSSO}}" target="_blank"><button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button></a>
                                 &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
                               </md-content>
                     </md-tab>
