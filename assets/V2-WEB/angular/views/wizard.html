@@ -380,7 +380,7 @@ md-steppers {
                               </div></br>
                               <div class="div-content"></div>
                               <div ng-if="dataReady"><strong>Kibana URL: </strong><br/><a href="{{elasticDashboardUrl}}" target="_blank"><h6>{{elasticDashboardUrl}}</h6></a></div>
-                              <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Stop Order Data Stream" to stop data generation</div></br>
+                              <div ng-if="show_text" class="alert alert-success">Data generation has started. Click "Start Application" to start your app<br/>You will get a kibana dashboard url in few minutes...</div></br>
                     <button class="btn btn-primary" ng-click="startDataStream()">Start Order Data Stream</button>
                      <button class="btn btn-primary" ng-click="startKinesisApp()" ng-disabled="enableStartStream">Start Application</button>
                     <button class="btn btn-primary" ng-click="stopDataStream()" ng-disabled="stopDataGeneration">Stop Order Data Stream</button>
@@ -447,9 +447,11 @@ md-steppers {
                           </div>
                           <div class="div-content">
                             <button class="btn btn-primary step-btn" ng-disabled="btn.step5" ng-click="createCrawler();disableIncBtn()">Process Incremental Data</button>
-                          </div>
-                          <div class="div-content" style="margin-left:20%;">
-                             To visit the Glue console to check the updated schema, you can click on the following button :
+                          </div><br/>
+                          <div class="query">
+                          <strong>To visit the Glue console to check the updated schema, you can click on the following button :</strong><br/>
+                          <strong>1.</strong> On Glue Console ,select Database 'yash-quickstart-datalake-raw-bucket-db' from Databases<br/>
+                          <strong>2.</strong> click on tables and select products table  then click 'Compare Versions' 
                           </div><br/>
                            <a href="{{glueConsoleUrl}}" target="_blank"><button class="btn btn-primary step-btn">                     Visit Glue Console</button></a><button class="btn btn-primary" ng-click="nextStep('outer', 5)" ng-disabled="enableStep5BNext" style="margin-left:2%;">Next</button>
 
@@ -567,6 +569,8 @@ md-steppers {
                                     </div>
 
                                  <button class="btn btn-primary step-btn" ng-disabled="btn.step7A" ng-click="runRedshiftAnalytics()">Run Analytics with Spectrum</button>&nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="createRedshiftCrawler()">Next</button><br/><br/><br/>
+                                 <div style="text-align: center;margin-left: 13%;" ng-if="step7ANote"><strong>This step will take Approximately 5 minutes to execute</strong></div><br/>
+                                 <div style="text-align: center;margin-left: 13%;" ng-if="step7nextNote"><strong>This step will take Approximately 1 minutes to execute</strong></div><br/>
                                  <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                                  <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                               </md-content>
@@ -587,6 +591,8 @@ md-steppers {
                           <button
                            class="btn btn-primary step-btn" ng-disabled="btn.step7B" ng-click="redShiftToTransformCopy()">Copy Analytics Results to Transformed Dataset</button>
                           &nbsp;&nbsp;<button class="btn btn-primary" ng-disabled="isRedshiftNext" ng-click="runTransformBucketCrawler()">Next</button><br/><br/><br/>
+                          <div style="text-align: center;margin-left: 13%;" ng-if="step7BNote"><strong>This step will take Approximately 6 minutes to execute</strong></div><br/>
+                          <div style="text-align: center;margin-left: 13%;" ng-if="step7BnextNote"><strong>This step will take Approximately 1 minutes to execute</strong></div><br/>
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                         </md-content>
@@ -680,6 +686,10 @@ md-steppers {
                             </div>
                            <button class="btn btn-primary step-btn" ng-disabled="btn.step9A" ng-click="runTransformToPublishJob()">Publish Data</button>&nbsp;&nbsp;
                            <button class="btn btn-primary" ng-click="createRunPublishCrawler()" ng-disabled="isQuickSight">Next</button><br/><br/><br/>
+                           
+                            <div style="text-align: center;margin-left: 13%;" ng-if="step9Anote"><strong>This step will take Approximately 3 minutes to execute</strong></div><br/>
+                          <div style="text-align: center;margin-left: 13%;" ng-if="step9Anextnote"><strong>This step will take Approximately 1 minutes to execute</strong></div><br/>
+
                            <div class="alert alert-info" ng-if="jobState" style="width:fit-content"> <strong>Job State </strong> {{jobName}}-{{jobState}} </div>
                            <div class="alert alert-info" ng-if="crawlerState" style="width:fit-content"> <strong>Crawler State </strong> {{crawlerState}} </div>
                         </md-content>
@@ -865,7 +875,7 @@ md-steppers {
                             </div>
                           </div>
                         </div>
-                                <a href="{{quickSightSSO}}" target="_blank"><button class="btn btn-primary step-btn">Visit Amazon QuickSight Console</button></a>
+                                <button class="btn btn-primary step-btn" ng-click="getQuickSightSignInUrl()">Visit Amazon QuickSight Console</button>
                                 &nbsp;&nbsp;<button class="btn btn-primary" ng-click="nextStep('outer', 9)" ng-disabled="btn1">Next</button>
                               </md-content>
                     </md-tab>
