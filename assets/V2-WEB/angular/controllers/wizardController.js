@@ -243,6 +243,7 @@ $scope.getCrawlerStatus = function() {
 
           if ($scope.selected == 6 && $scope.subRedshift == 0) {
             $scope.subRedshift = 1
+            $scope.crawlerState = ''
            } else if ($scope.selected == 6 && $scope.subRedshift == 1) {
             $scope.selected = 7
            } else if($scope.selected == 2) {
@@ -696,6 +697,7 @@ $scope.stopKinesisApp = function() {
  $scope.runRedshiftAnalytics = function() {
    $scope.show.loader = true
    $scope.btn.step7A = true
+   $scope.step7ANote = true
     var run_analytics_queries_job = lambda_api + "redshiftanalyticsqueries";
     $http({
       method: 'GET',
@@ -722,6 +724,8 @@ $scope.stopKinesisApp = function() {
  $scope.createRedshiftCrawler = function() {
    $scope.show.loader = true
    $scope.isRedshiftNext = true
+   $scope.step7ANote = false
+   $scope.step7nextNote = true
   $scope.btn1 = true
   $http({
     method: 'GET',
@@ -748,6 +752,8 @@ $scope.stopKinesisApp = function() {
  $scope.redShiftToTransformCopy = function() {
    $scope.show.loader = true
    $scope.btn.step7B = true
+   $scope.step7BNote = true
+   $scope.crawlerState = ''
     var redshift_transform_copy = lambda_api + "redshifttotransformcopy";
     $http({
       method: 'GET',
@@ -773,6 +779,8 @@ $scope.stopKinesisApp = function() {
  }
 
  $scope.runTransformBucketCrawler = function() {
+  $scope.step7BNote = false
+  $scope.step7BnextNote = true
    $http({
     method: 'GET',
     url: transform_redshift_crawler_lambda_api,
@@ -798,6 +806,7 @@ $scope.stopKinesisApp = function() {
  $scope.runTransformToPublishJob = function() {
    $scope.show.loader = true
    $scope.btn.step9A = true
+   $scope.step9Anote = true
     var run_transform_to_publish_job = lambda_api + "run_transform_to_publish_job";
     $http({
       method: 'GET',
@@ -823,6 +832,8 @@ $scope.stopKinesisApp = function() {
  }
 
  $scope.createRunPublishCrawler = function() {
+  $scope.step9Anote = false
+  $scope.step9Anextnote = true
    $http({
     method: 'GET',
     url: publish_crawler_lambda_api,
@@ -909,14 +920,13 @@ $scope.stopKinesisApp = function() {
       var res1 = JSON.stringify(response);
       $scope.signInToken = response.data['SigninToken']
       $scope.quickSightSSO = "https://signin.aws.amazon.com/federation?Action=login&Issuer="+thisUrlEncoded+"&Destination="+quicksightUrlEncoded+"&SigninToken="+$scope.signInToken;
-
+     // window.open($scope.quickSightSSO,'_blank')
     }, function myError(response) {
     });
      
     } 
       });
   }
-   $scope.getQuickSightSignInUrl()
    $scope.refreshToken = function() {
     var encryptedAES = localStorage.getItem('secretKey')
     var decryptedBytes = window.CryptoJS.AES.decrypt(encryptedAES, "My Secret Passphrase");
