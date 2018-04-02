@@ -1,0 +1,30 @@
+{
+   "AWSTemplateFormatVersion" : "2010-09-09",
+   "Description" : "Ec2 block device mapping",
+    "Mappings": {
+        "AWSAMIRegionMap": {
+            
+            "us-east-1": {
+                "AWSNATHVM": "ami-da05a4a0"
+            }
+        }
+    },
+   "Resources" : {
+      "MyEC2Instance" : {
+         "Type" : "AWS::EC2::Instance",
+         "Properties" : {
+            "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AWSNATHVM"
+                    ]
+                },
+            "KeyName" : "Infra-with-UI",
+			"InstanceType" : "t2.micro"            
+         }
+      }
+   }
+} 
