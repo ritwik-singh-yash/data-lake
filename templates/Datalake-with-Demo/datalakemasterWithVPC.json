@@ -1,0 +1,2748 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "Data Lake Foundation is a QuickStart that provides a Data Lake architecture, Redshift cluster, Elasticsearch domain, Data Lake walk-through wizard running on AWS EC2 instance, in the same VPC through Cloudformation templates that provision and configure the required resources, including related QuickStarts. This template provisions all of the resources that are specific to the Quick Start.  Leveraged Quick Starts (VPC, LinuxBastion), if needed, can be provisioned by using the data-lake-foundation-master template. **WARNING** You will be billed for the AWS resources used if you create a stack from this template. (qs-1nlkhq1nt)",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "AvailabilityZones"                        
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Demonstration Configuration"
+                    },
+                    "Parameters": [                        
+                        "DatasetS3BucketName",
+                        "DatasetS3KeyPrefix"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Elasticsearch Configuration"
+                    },
+                    "Parameters": [
+                        "RemoteAccessCIDR",
+                        "ElasticsearchNodeType",
+                        "ElasticsearchNodeCount"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Redshift Configuration"
+                    },
+                    "Parameters": [
+                        "RedshiftUsername",
+                        "RedshiftPassword",
+                        "RedshiftNumberOfNodes",
+                        "RedshiftNodeType"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Kinesis Configuration"
+                    },
+                    "Parameters": [
+                        "KinesisDataStreamName",
+                        "KinesisDataStreamS3Prefix"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "AWS Quick Start Configuration"
+                    },
+                    "Parameters": [
+                        "QSS3BucketName",
+                        "QSS3KeyPrefix",
+                        "KeyPairName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Cognito Configuration"
+                    },
+                    "Parameters": [                                                                     
+						"CognitoUsername",
+						"CognitoPassword"
+                    ]
+                }
+            ],
+            "ParameterLabels": {                                               
+                "AvailabilityZones": {
+                    "default": "Availability Zones"
+                },
+                "KeyPairName": {
+                    "default": "Key Pair Name"
+                },
+                "RemoteAccessCIDR": {
+                    "default": "Remote Access CIDR"
+                },
+                "ElasticsearchNodeType": {
+                    "default": "Elasticsearch Node Type"
+                },
+                "ElasticsearchNodeCount": {
+                    "default": "Elasticsearch Node Count"
+                },                
+                "RedshiftUsername": {
+                    "default": "Redshift User Name"
+                },
+                "RedshiftPassword": {
+                    "default": "Redshift Password"
+                },
+                "RedshiftNumberOfNodes": {
+                    "default": "Redshift Number of Nodes"
+                },
+                "RedshiftNodeType": {
+                    "default": "Redshift Node Type"
+                },             
+                "QSS3BucketName": {
+                    "default": "Quick Start S3 Bucket Name"
+                },
+                "QSS3KeyPrefix": {
+                    "default": "Quick Start S3 Key Prefix"
+                },
+                "DatasetS3BucketName": {
+                    "default": "Dataset S3 Bucket Name"
+                },
+                "DatasetS3KeyPrefix": {
+                    "default": "Dataset S3 Key Prefix"
+                },                
+                "KinesisDataStreamName": {
+                    "default": "Kinesis Data Stream Name"
+                },
+                "KinesisDataStreamS3Prefix": {
+                    "default": "Kinesis Data Stream S3 Prefix"
+                },
+				"CognitoUsername":{
+					"default": "Cognito Username  "
+				},
+				"CognitoPassword":{
+					"default": "Cognito Password"
+				}
+            }
+        }
+    },
+    "Mappings": {
+        "VPCDefinitions": {
+            "QuickstartDefault": {
+                "VPCCIDR": "10.0.0.0/16",
+                "PublicSubnet1CIDR": "10.0.128.0/20",
+                "PrivateSubnet1CIDR": "10.0.0.0/19",
+                "PublicSubnet2CIDR": "10.0.144.0/20",
+                "PrivateSubnet2CIDR": "10.0.32.0/19",
+                "NumberOfAZs": "2"
+            }
+        }
+    },    
+    "Parameters": {
+        "AvailabilityZones": {
+            "Description": "The list of Availability Zones to use for the subnets in the VPC. You must specify two Availability Zones. By default, the Quick Start preserves the logical order you specify.",
+            "Type": "List<AWS::EC2::AvailabilityZone::Name>",
+			"Default":"us-west-2a,us-west-2b"
+        },        
+        "DatasetS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Dataset bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "yash-quickstart-datalake",
+            "Description": "S3 bucket where the sample dataset is installed. The bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen. Use this parameter to specify the S3 bucket name that you would like the Quick Start to to load, if you decide to use a different dataset, or if you decide to customize or extend the Quick Start dataset. (For more information, see Using Your Own Dataset.) Keep the default setting to use the sample dataset included with the Quick Start.",
+            "Type": "String"
+        },
+        "DatasetS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "ConstraintDescription": "Dataset key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "datasets/data/v3",
+            "Description": "S3 key prefix where the sample dataset is installed. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes, but should not start with a forward slash, which is automatically added. Use this parameter to specify the location for the dataset you would like the Quick Start to load, if you decide to use a different dataset, or if you decide to customize or extend the Quick Start dataset. (For more information, see Using Your Own Dataset.) Keep the default setting to use the sample dataset included with the Quick Start.",
+            "Type": "String"
+        },		
+        "ElasticsearchNodeCount": {
+            "Default": "1",
+            "Description": "The number of nodes in the Elasticsearch cluster. For guidance, see the Amazon ES documentation.",
+            "Type": "Number"
+        },
+        "ElasticsearchNodeType": {
+            "AllowedValues": [
+                "t2.small.elasticsearch",
+                "m4.large.elasticsearch",
+                "m4.xlarge.elasticsearch",
+                "c4.large.elasticsearch",
+                "c4.xlarge.elasticsearch",
+                "r4.large.elasticsearch",
+                "r4.xlarge.elasticsearch"
+            ],
+            "ConstraintDescription": "must be a valid Elasticsearch node type.",
+            "Default": "t2.small.elasticsearch",
+            "Description": "EC2 instance type for the Elasticsearch cluster.",
+            "Type": "String"
+        },
+        "KeyPairName": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName",
+			"Default":"DataLakeFoundationYash"
+        },
+        "QSS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "yash-quickstart-datalake",
+            "Description": "S3 bucket where the Quick Start templates and scripts are installed. Use this parameter to specify the S3 bucket name you’ve created for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. The bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+            "Type": "String"
+        },
+        "QSS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+            "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+            "Default": "SourceTemplates",
+            "Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes.",
+            "Type": "String"
+        },       
+        "RedshiftNodeType": {
+            "AllowedValues": [
+                "dw1.xlarge",
+                "dw1.8xlarge",
+                "dw2.large",
+                "dw2.8xlarge",
+                "dc1.large",
+                "dc1.8xlarge",
+                "ds1.xlarge",
+                "ds1.8xlarge",
+                "ds2.xlarge",
+                "ds2.8xlarge"
+            ],
+            "ConstraintDescription": "must be a valid Redshift node type.",
+            "Default": "dc1.large",
+            "Description": "Instance type for the nodes in the Amazon Redshift cluster.",
+            "Type": "String"
+        },
+        "RedshiftNumberOfNodes": {
+            "Default": "1",
+            "Description": "The number of nodes in the Amazon Redshift cluster. If you specify a number that’s larger than 1, the Quick Start will launch a multi-node cluster.",
+            "Type": "Number"
+        },
+        "RedshiftPassword": {
+            "AllowedPattern": "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9!#$%&()*+,.:;<=>?\\[\\]^_`{|}~-]*$",
+            "ConstraintDescription": "Password must contain 8 to 64 printable ASCII characters excluding: /, \", \\', \\ and @. It must contain 1 uppercase letter, 1 lowercase letter, and 1 number.",
+            "Description": "The password that is associated with the master user account for the Amazon Redshift cluster. The password must contain 8 to 64 printable ASCII characters, excluding: /, \", \\', \\ and @. It must contain one uppercase letter, one lowercase letter, and one number.",
+            "MaxLength": "64",
+            "MinLength": "8",
+            "NoEcho": "true",
+            "Type": "String"
+        },
+        "RedshiftUsername": {
+            "AllowedPattern": "^[a-z][a-z0-9_]*$",
+            "ConstraintDescription": "User name parameter must be lowercase, begin with a letter, contain only alphanumeric characters or underscores, and be less than 128 characters.",
+            "Default": "datalake",
+            "Description": "The user name that is associated with the master user account for the Amazon Redshift cluster. The user name must contain fewer than 128 alphanumeric characters or underscores, and must be lowercase and begin with a letter. ",
+            "MaxLength": "128",
+            "MinLength": "1",
+            "Type": "String"
+        },
+        "RemoteAccessCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
+            "Description": "The CIDR IP range that is permitted to SSH into the bastion host instance and access Amazon ES. We recommend that you set this value to a trusted IP range. For example, you might want to grant only your corporate network access to the software. You can use http://checkip.amazonaws.com/  to check your IP address. This parameter must be in the form x.x.x.x/x (e.g., 96.127.8.12/32, YOUR_IP/32).",
+            "Type": "String",
+			"Default":"0.0.0.0/0"
+        },
+        "PubliclyAccessible": {
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Default": "true",
+            "Description": "Indicates whether the cluster can be accessed from a public network.",
+            "Type": "String"
+        },          
+        "CognitoUsername": {
+            "Description": "Enter cognito user name",
+            "Type": "String",
+			"Default":"yashinnovation"
+        },
+        "CognitoPassword": {
+            "Description": "Enter cognito user password",
+            "Type": "String",
+			"NoEcho": "true"
+        }
+    },
+    "Resources": {
+        "VPCStack": {
+            "Properties": {
+                "Parameters": {
+                    "AvailabilityZones": {
+                        "Fn::Join": [
+                            ",",
+                            {
+                                "Ref": "AvailabilityZones"
+                            }
+                        ]
+                    },
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "NumberOfAZs": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            "QuickstartDefault",
+                            "NumberOfAZs"
+                        ]
+                    },
+                    "PrivateSubnet1ACIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            "QuickstartDefault",
+                            "PrivateSubnet1CIDR"
+                        ]
+                    },
+                    "PrivateSubnet2ACIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            "QuickstartDefault",
+                            "PrivateSubnet2CIDR"
+                        ]
+                    },
+                    "PublicSubnet1CIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            "QuickstartDefault",
+                            "PublicSubnet1CIDR"
+                        ]
+                    },
+                    "PublicSubnet2CIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            "QuickstartDefault",
+                            "PublicSubnet2CIDR"
+                        ]
+                    },
+                    "VPCCIDR": {
+                        "Fn::FindInMap": [
+                            "VPCDefinitions",
+                            "QuickstartDefault",
+                            "VPCCIDR"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/aws-vpc-public-s3VPCendpoint.json"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "LambdaRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Policies": [
+                    {
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": "arn:aws:logs:*:*:*"
+                                }
+                            ],
+                            "Version": "2012-10-17"
+                        },
+                        "PolicyName": "LambdaLogging"
+                    },
+                    {
+                        "PolicyDocument": {
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:s3:::${RawBucketName}/*",
+                                                {
+                                                    "RawBucketName": {
+                                                        "Fn::Join": [
+                                                            "-",
+                                                            [
+                                                                "datalake",
+                                                                "raw",
+                                                                {
+                                                                    "Ref": "AWS::AccountId"
+                                                                },
+                                                                {
+                                                                    "Ref": "AWS::Region"
+                                                                }
+                                                            ]
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:s3:::${TransformedDatasetsBucket}/*",
+                                                {
+                                                    "TransformedDatasetsBucket": {
+                                                        "Fn::Join": [
+                                                            "-",
+                                                            [
+                                                                "datalake",
+                                                                "transformed",
+                                                                "datasets",
+                                                                {
+                                                                    "Ref": "AWS::AccountId"
+                                                                },
+                                                                {
+                                                                    "Ref": "AWS::Region"
+                                                                }
+                                                            ]
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Sub": [
+                                                "arn:aws:s3:::${EnrichedDataBucket}/*",
+                                                {
+                                                    "EnrichedDataBucket": {
+                                                        "Fn::Join": [
+                                                            "-",
+                                                            [
+                                                                "datalake",
+                                                                "published",
+                                                                "data",
+                                                                {
+                                                                    "Ref": "AWS::AccountId"
+                                                                },
+                                                                {
+                                                                    "Ref": "AWS::Region"
+                                                                }
+                                                            ]
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "Version": "2012-10-17"
+                        },
+                        "PolicyName": "GetObjectsDatalake"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "IndexCreationLambdaRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Action": [
+                                        "es:*"
+                                    ],
+                                    "Effect": "Allow",
+                                    "Resource": "*"
+                                }
+                            ]
+                        },
+                        "PolicyName": "ESFullAccess"
+                    }
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "ElasticsearchStack": {
+            "DependsOn": [],
+            "Properties": {
+                "Parameters": {
+                    "ElasticsearchAccessIP": {
+                        "Ref": "RemoteAccessCIDR"
+                    },
+                    "NAT1ElasticIP": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.NAT1EIP"
+                        ]
+                    },
+                    "NAT2ElasticIP": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.NAT2EIP"
+                        ]
+                    },
+                    "NodeCount": {
+                        "Ref": "ElasticsearchNodeCount"
+                    },
+                    "NodeType": {
+                        "Ref": "ElasticsearchNodeType"
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/ElasticSearch.json"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "metadataFunction": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "lambda_function.lambda_handler",
+                "Runtime": "python2.7",
+                "CodeUri": {
+                    "Bucket": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "Key": {
+                        "Fn::Sub": [
+                            "${QSS3KeyPrefix}/metadataESFunction.zip",
+                            {
+                                "QSS3KeyPrefix": {
+                                    "Ref": "QSS3KeyPrefix"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "Description": "A starter AWS Lambda function.",
+                "MemorySize": 128,
+                "Timeout": 3,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "LambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Environment": {
+                    "Variables": {
+                        "ES_endpoint": {
+                            "Fn::GetAtt": [
+                                "ElasticsearchStack",
+                                "Outputs.ElasticsearchEndpoint"
+                            ]
+                        }
+                    }
+                },
+                "Events": {
+                    "RawBucketEvent": {
+                        "Type": "S3",
+                        "Properties": {
+                            "Bucket": {
+                                "Ref": "RawBucket"
+                            },
+                            "Events": [
+                                "s3:ObjectCreated:*"
+                            ]
+                        }
+                    },
+                    "TransformedDatasetsEvent": {
+                        "Type": "S3",
+                        "Properties": {
+                            "Bucket": {
+                                "Ref": "TransformedDatasets"
+                            },
+                            "Events": [
+                                "s3:ObjectCreated:*"
+                            ]
+                        }
+                    },
+                    "PublishedDataEvent": {
+                        "Type": "S3",
+                        "Properties": {
+                            "Bucket": {
+                                "Ref": "PublishedData"
+                            },
+                            "Events": [
+                                "s3:ObjectCreated:*"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "AddUserESIndexFunction": {
+            "DependsOn": "ElasticsearchStack",
+            "Properties": {
+                "Environment": {
+                    "Variables": {
+                        "esEndPoint": {
+                            "Fn::GetAtt": [
+                                "ElasticsearchStack",
+                                "Outputs.ElasticsearchEndpoint"
+                            ]
+                        },
+                        "region": {
+                            "Ref": "AWS::Region"
+                        }
+                    }
+                },
+                "Code": {
+                    "S3Bucket": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "S3Key": {
+                        "Fn::Sub": [
+                            "${QSS3KeyPrefix}/CreateESIndex.zip",
+                            {
+                                "QSS3KeyPrefix": {
+                                    "Ref": "QSS3KeyPrefix"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "Handler": "lambda_function.lambda_handler",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "IndexCreationLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python2.7",
+                "Timeout": 30
+            },
+            "Type": "AWS::Lambda::Function"
+        },
+        "InvokeAddESIndex": {
+            "Type": "Custom::LambdaCall",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "AddUserESIndexFunction",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "RawBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "datalake",
+                            "raw",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "TransformedDatasets": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "datalake",
+                            "transformed",
+                            "datasets",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "PublishedData": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "datalake",
+                            "published",
+                            "data",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "RegionalLambdaBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "regional",
+                            "lambda",
+                            "bucket",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "LogsBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "datalake",
+                            "logs",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                }
+            }
+        },
+        "WebsiteHostingbucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "datalake",
+                            "serverless",
+                            "websitehosting",
+                            {
+                                "Ref": "AWS::AccountId"
+                            },
+                            {
+                                "Ref": "AWS::Region"
+                            }
+                        ]
+                    ]
+                },
+                "WebsiteConfiguration": {
+                    "IndexDocument": "login.html",
+                    "ErrorDocument": "error.html"
+                }
+            }
+        },
+        "BastionStack": {
+            "Properties": {
+                "Parameters": {
+                    "EnableTCPForwarding": "true",
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "RawBucketRef": {
+                        "Ref": "RawBucket"
+                    },
+                    "PublicSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "PublicSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet2ID"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },
+                    "RemoteAccessCIDR": {
+                        "Ref": "RemoteAccessCIDR"
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    },
+                    "DatasetS3BucketName": {
+                        "Ref": "DatasetS3BucketName"
+                    },
+                    "DatasetS3KeyPrefix": {
+                        "Ref": "DatasetS3KeyPrefix"
+                    },
+                    "WebsiteHostingbucket": {
+                        "Ref": "WebsiteHostingbucket"
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/LinuxBastionWithCopyData.json"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "DataLakeFoundationStack": {
+            "DependsOn": [
+                "VPCStack",
+                "BastionStack"
+            ],
+            "Properties": {
+                "Parameters": {
+                    "PrivateSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1AID"
+                        ]
+                    },
+                    "PrivateSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet2AID"
+                        ]
+                    },
+                    "PublicSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "PublicSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet2ID"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },                  
+                    "RedshiftNodeType": {
+                        "Ref": "RedshiftNodeType"
+                    },
+                    "RedshiftNumberOfNodes": {
+                        "Ref": "RedshiftNumberOfNodes"
+                    },
+                    "RedshiftPassword": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RedshiftUsername": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "PubliclyAccessible": {
+                        "Ref": "PubliclyAccessible"
+                    },
+                    "VPCCIDR": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCCIDR"
+                        ]
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    },                                                            
+                    "RawBucket": {
+                        "Ref": "RawBucket"
+                    },
+                    "TransformedDatasets": {
+                        "Ref": "TransformedDatasets"
+                    },
+                    "PublishedData": {
+                        "Ref": "PublishedData"
+                    },
+                    "LogsBucket": {
+                        "Ref": "LogsBucket"
+                    },                    
+                    "ElasticSearchDomianARN": {
+                        "Fn::GetAtt": [
+                            "ElasticsearchStack",
+                            "Outputs.ElasticsearchDomainARN"
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/datalake-merged.json"
+                }
+            },
+            "Type": "AWS::CloudFormation::Stack"
+        },
+        "APIHandler": {
+            "Type": "AWS::Serverless::Function",
+            "DependsOn": "DataLakeFoundationStack",
+            "Properties": {
+                "Tags": {
+                    "aws-chalice": "version=1.0.4:stage=dev:app=AwsServerlessDataLake"
+                },
+                "MemorySize": 3008,
+                "Environment": {
+                    "Variables": {
+                        "destination_bucket_name": {
+                            "Ref": "WebsiteHostingbucket"
+                        },
+                        "user_pool_name": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.CognitoUserPoolName"
+                            ]
+                        },
+                        "properties_file_name": "appconfig.ini",
+                        "cognito_pool_arn": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.CognitoUserPoolARN"
+                            ]
+                        },
+                        "crawler_on_raw_bucket": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.RawCrawler"
+                            ]
+                        },
+                        "crawler_on_transfromed_bucket": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.TransformedCrawler"
+                            ]
+                        },
+                        "crawler_on_published_bucket": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.PublishedCrawler"
+                            ]
+                        },
+                        "crawler_on_redshift_data": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.RedshiftCrawler"
+                            ]
+                        },
+                        "raw_to_transformed_job": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.RawToTransformedJob"
+                            ]
+                        },
+                        "transformed_to_published_job": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.TransformedToPublishedJob"
+                            ]
+                        },
+                        "transformed_to_redshift_job": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.TransformedToRedshiftJob"
+                            ]
+                        },
+                        "run_redshift_analytics_queries_job": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.RedshiftAnalyticsQueriesJob"
+                            ]
+                        },
+                        "redshift_to_transformed_job": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.RedshiftToTransformedJob"
+                            ]
+                        },
+                        "redshift_spectrum_create_external_schema_job": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.RedshiftSpectrumCreateExternalSchemaJob"
+                            ]
+                        },
+                        "ConnectionURL": {
+                            "Fn::GetAtt": [
+                                "DataLakeFoundationStack",
+                                "Outputs.ConnectionURL"
+                            ]
+                        },
+                        "region": {
+                            "Ref": "AWS::Region"
+                        },
+                        "glue_endpoint": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "https://glue.",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    },
+                                    ".amazonaws.com"
+                                ]
+                            ]
+                        },
+                        "raw_bucket_name": {
+                            "Ref": "RawBucket"
+                        }
+                    }
+                },
+                "Handler": "app.app",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "DataLakeFoundationStack",
+                        "Outputs.kinesisLambdaS3RoleARN"
+                    ]
+                },
+                "Timeout": 300,
+                "CodeUri": {
+                    "Bucket": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "Key": {
+                        "Fn::Sub": [
+                            "${QSS3KeyPrefix}/lambdaFunctions.zip",
+                            {
+                                "QSS3KeyPrefix": {
+                                    "Ref": "QSS3KeyPrefix"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "Runtime": "python2.7",
+                "Events": {
+                    "RawDatajobgetefde": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/rawtransformetl",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "createsignintokenpostd81a": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/getSignInToken",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "post"
+                        }
+                    },
+                    "authenticatedget2220": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/getProperties",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "runredshiftcommandsgetb553": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/redshift",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "readPropertiesgetf3de": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/prop",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "callingcreatecrawlerget3bc6": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/crawler",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "crawlerontransformedget3c7c": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/transformcrawler",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "runredshiftjobsgetdc02": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/transformedredshift",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "runredshifttotransformcopyanalyticsget5dd0": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/redshifttotransformcopy",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "runtransformTopublishJobget970b": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/run_transform_to_publish_job",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "createandruncrawlerredshiftDBgeta211": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/runredshiftcrawler",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "createrunpublishcrawlergetb821": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/create_run_publish_crawler",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "runcrawlerget9092": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/run_crawler",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "runredshiftanalyticsqueriesgetbca3": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/redshiftanalyticsqueries",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    },
+                    "copyincrementaldatatorawbucketgetfa32": {
+                        "Type": "Api",
+                        "Properties": {
+                            "Path": "/add-incremental_data",
+                            "RestApiId": {
+                                "Ref": "RestAPI"
+                            },
+                            "Method": "get"
+                        }
+                    }
+                }
+            }
+        },
+        "RestAPI": {
+            "Type": "AWS::Serverless::Api",
+            "DependsOn": "DataLakeFoundationStack",
+            "Properties": {
+                "DefinitionBody": {
+                    "info": {
+                        "version": "1.0",
+                        "title": "AwsServerlessDataLake_2Jan2018"
+                    },
+                    "paths": {
+                        "/getProperties": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/getSignInToken": {
+                            "post": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'POST,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/crawler": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/rawtransformetl": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/prop": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/transformcrawler": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/redshift": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/transformedredshift": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/run_transform_to_publish_job": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/redshiftanalyticsqueries": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/redshifttotransformcopy": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/run_crawler": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/runredshiftcrawler": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/create_run_publish_crawler": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        },
+                        "/add-incremental_data": {
+                            "options": {
+                                "responses": {
+                                    "200": {
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "type": "mock",
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "responses": {
+                                        "default": {
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                                "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Authorization,Content-Type,X-Amz-Date,X-Amz-Security-Token,X-Api-Key'"
+                                            },
+                                            "statusCode": "200"
+                                        }
+                                    }
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            },
+                            "get": {
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "security": [
+                                    {
+                                        "CognitoAuthorizer": []
+                                    }
+                                ],
+                                "x-amazon-apigateway-integration": {
+                                    "contentHandling": "CONVERT_TO_TEXT",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${APIHandler.Arn}/invocations"
+                                    },
+                                    "httpMethod": "POST",
+                                    "passthroughBehavior": "when_no_match",
+                                    "type": "aws_proxy"
+                                },
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ]
+                            }
+                        }
+                    },
+                    "schemes": [
+                        "https"
+                    ],
+                    "securityDefinitions": {
+                        "CognitoAuthorizer": {
+                            "x-amazon-apigateway-authtype": "cognito_user_pools",
+                            "type": "apiKey",
+                            "name": "Authorization",
+                            "x-amazon-apigateway-authorizer": {
+                                "providerARNs": [
+                                    {
+                                        "Fn::GetAtt": [
+                                            "DataLakeFoundationStack",
+                                            "Outputs.CognitoUserPoolARN"
+                                        ]
+                                    }
+                                ],
+                                "type": "cognito_user_pools"
+                            },
+                            "in": "header"
+                        }
+                    },
+                    "x-amazon-apigateway-binary-media-types": [
+                        "application/octet-stream",
+                        "application/x-tar",
+                        "application/zip",
+                        "audio/basic",
+                        "audio/ogg",
+                        "audio/mp4",
+                        "audio/mpeg",
+                        "audio/wav",
+                        "audio/webm",
+                        "image/png",
+                        "image/jpg",
+                        "image/gif",
+                        "video/ogg",
+                        "video/mpeg",
+                        "video/webm"
+                    ],
+                    "definitions": {
+                        "Empty": {
+                            "type": "object",
+                            "title": "Empty Schema"
+                        }
+                    },
+                    "swagger": "2.0"
+                },
+                "StageName": "api"
+            }
+        },
+        "InvokeLambdaStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "DependsOn": [
+                "APIHandler",
+                "RestAPI"
+            ],
+            "Properties": {
+                "Parameters": {
+                    "RoleARN": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.kinesisLambdaS3RoleARN"
+                        ]
+                    },
+                    "DestinationResourceBucket": {
+                        "Ref": "WebsiteHostingbucket"
+                    },
+                    "RawBucket": {
+                        "Ref": "RawBucket"
+                    },
+                    "USERPOOLID": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.CognitoUserPoolId"
+                        ]
+                    },
+                    "USERPOOLCLIENTID": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.CognitoUserPoolClientID"
+                        ]
+                    },
+                    "IdentityPoolId": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.CognitoIdentityPoolId"
+                        ]
+                    },
+                    "UserPoolProviderName": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.CognitoUserPoolProviderName"
+                        ]
+                    },
+                    "UserPoolARN": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.CognitoUserPoolARN"
+                        ]
+                    },
+                    "UserPoolName": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.CognitoUserPoolName"
+                        ]
+                    },
+                    "DataCleaningApplication": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.DataCleaningApplication"
+                        ]
+                    },
+                    "DataAggregationApplication": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.DataAggregationApplication"
+                        ]
+                    },
+                    "DataCleaningInputStream": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.DataCleaningInputStream"
+                        ]
+                    },
+                    "DataCleaningOutputStream": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.DataCleaningOutputStream"
+                        ]
+                    },
+                    "DataAggregationOutputStream1": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.DataAggregationOutputStream1"
+                        ]
+                    },
+                    "DataAggregationOutputStream2": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.DataAggregationOutputStream2"
+                        ]
+                    },
+                    "ENDPOINTURL": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "https://",
+                                {
+                                    "Ref": "RestAPI"
+                                },
+                                ".execute-api.",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                ".amazonaws.com/api/"
+                            ]
+                        ]
+                    },
+                    "Username": {
+                        "Ref": "CognitoUsername"
+                    },
+                    "Password": {
+                        "Ref": "CognitoPassword"
+                    },
+                    "RawCrawler": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.RawCrawler"
+                        ]
+                    },
+                    "TransformedCrawler": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.TransformedCrawler"
+                        ]
+                    },
+                    "PublishedCrawler": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.PublishedCrawler"
+                        ]
+                    },
+                    "RedshiftCrawler": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.RedshiftCrawler"
+                        ]
+                    },
+                    "RawToTransformedJob": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.RawToTransformedJob"
+                        ]
+                    },
+                    "TransformedToPublishedJob": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.TransformedToPublishedJob"
+                        ]
+                    },
+                    "TransformedToRedshiftJob": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.TransformedToRedshiftJob"
+                        ]
+                    },
+                    "RedshiftAnalyticsQueriesJob": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.RedshiftAnalyticsQueriesJob"
+                        ]
+                    },
+                    "RedshiftToTransformedJob": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.RedshiftToTransformedJob"
+                        ]
+                    },
+                    "RedshiftSpectrumCreateExternalSchemaJob": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.RedshiftSpectrumCreateExternalSchemaJob"
+                        ]
+                    },
+                    "ConnectionURL": {
+                        "Fn::GetAtt": [
+                            "DataLakeFoundationStack",
+                            "Outputs.ConnectionURL"
+                        ]
+                    },
+                    "RedshiftUsername": {
+                        "Ref": "RedshiftUsername"
+                    },
+                    "RedshiftPassword": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "KibanaURL": {
+                        "Fn::GetAtt": [
+                            "ElasticsearchStack",
+                            "Outputs.KibanaURL"
+                        ]
+                    },
+                    "StreamMetaDataURL": {
+                        "Fn::GetAtt": [
+                            "ElasticsearchStack",
+                            "Outputs.StreamMetaDataURL"
+                        ]
+                    },
+                    "GlueEndPOint": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "https://glue.",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                ".amazonaws.com"
+                            ]
+                        ]
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}/lambda.json"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "WebsiteURL": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "WebsiteHostingbucket",
+                    "WebsiteURL"
+                ]
+            },
+            "Description": "URL for the website hosted on S3 and use /register.html for registration"
+        },
+		"RedshfitConnectionURL": {
+					"Value": {
+						"Fn::GetAtt": [
+							"DataLakeFoundationStack",
+							"Outputs.ConnectionURL"
+						]
+					}
+				},
+		 "KibanaURL": {
+					"Description": "Kibana URL",
+					"Value": {
+						"Fn::Join": [
+							"",
+							[
+								{
+									"Fn::GetAtt": [
+										"ElasticsearchStack",
+										"Outputs.StreamMetaDataURL"
+									]
+								},
+								"/_plugin/kibana/app/kibana#/dashboard/Stream-Data-Lake-Metadata"
+							]
+						]
+					}
+				}
+			}
+    
+}

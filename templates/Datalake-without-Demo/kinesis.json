@@ -1,0 +1,316 @@
+{
+    "Description": "Sample Kinesis via CloudFormation",
+    "Parameters": {
+        "RawFirehoseBucket": {
+            "Default": "",
+            "Description": "Enter Bucket Name for Firehose1 storing data",
+            "Type": "String"
+        },
+        "TransformedFirehoseBucket": {
+            "Default": "",
+            "Description": "Enter Bucket Name for Firehose1 storing data",
+            "Type": "String"
+        },
+		"DataCleaningInputStream": {
+            "Description": "Enter name for Data Cleaning Application input stream",
+            "Type": "String"
+        },
+        "DataCleaningOutputStream": {
+            "Description": "Enter name for Data Cleaning Application output stream",
+            "Type": "String"
+        },
+        "DataAggregationOutputStream1": {
+            "Description": "Enter name for Data Aggregation Application output stream",
+            "Type": "String"
+        },
+        "DataAggregationOutputStream2": {
+            "Description": "Enter name for Data Aggregation Application output stream",
+            "Type": "String"
+        },
+        "DataAggregationOutputStream3": {
+            "Description": "Enter name for Data Aggregation Application output stream",
+            "Type": "String"
+        },
+        "RedshiftConnectionURL": {
+            "Description": "Redshift connection URL",
+            "Type": "String"
+        },
+        "RedshiftPassword": {
+            "Description": "Redshift password.",
+            "NoEcho": "true",
+            "Type": "String"
+        },
+        "RedshiftUsername": {
+            "Description": "Redshift username.",
+            "Type": "String"
+        },
+        "ElasticSearchDomianARN": {
+            "Description": "Domian ARN of ES",
+            "Type": "String"
+        },
+        "FirehoseDeliveryRoleARN": {
+            "Description": "ARN of FirehoseDeliveryRole",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "KinesisFirehoseDeliveryStream1": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "DataCleaningInputStream"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "S3DestinationConfiguration": {
+                    "BucketARN": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:s3:::",
+                                {
+                                    "Ref": "RawFirehoseBucket"
+                                }
+                            ]
+                        ]
+                    },
+                    "BufferingHints": {
+                        "IntervalInSeconds": "60",
+                        "SizeInMBs": "1"
+                    },
+                    "CompressionFormat": "UNCOMPRESSED",
+                    "Prefix": "Orders_Stream/",
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    }
+                }
+            }
+        },
+        "KinesisFirehoseDeliveryStream2": {
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "DataCleaningOutputStream"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "RedshiftDestinationConfiguration": {
+                    "ClusterJDBCURL": {
+                        "Ref": "RedshiftConnectionURL"
+                    },
+                    "CopyCommand": {
+                        "CopyOptions": "region 'us-west-2' delimiter ','csv",
+                        "DataTableName": "orders",
+                        "DataTableColumns": "customer_id,sku,amount_spent,order_date,longitude,latitude,product_quantity"
+                    },
+                    "Password": {
+                        "Ref": "RedshiftPassword"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "1"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Orders_Stream/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    },
+                    "Username": {
+                        "Ref": "RedshiftUsername"
+                    }
+                }
+            },
+            "Type": "AWS::KinesisFirehose::DeliveryStream"
+        },
+        "KinesisFirehoseDeliveryStream3": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "DataAggregationOutputStream1"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 1
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticSearchDomianARN"
+                    },
+                    "IndexName": "stream-metadata",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "datalake-metadata-1",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "1"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Temp/Firehose3_output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisFirehoseDeliveryStream4": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "DataAggregationOutputStream2"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 1
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticSearchDomianARN"
+                    },
+                    "IndexName": "stream-metadata",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "datalake-metadata-2",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "1"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Temp/Firehose4_output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    }
+                }
+            }
+        },
+        "KinesisFirehoseDeliveryStream5": {
+            "Type": "AWS::KinesisFirehose::DeliveryStream",
+            "Properties": {
+                "DeliveryStreamName": {
+                    "Ref": "DataAggregationOutputStream3"
+                },
+                "DeliveryStreamType": "DirectPut",
+                "ElasticsearchDestinationConfiguration": {
+                    "BufferingHints": {
+                        "IntervalInSeconds": 60,
+                        "SizeInMBs": 1
+                    },
+                    "DomainARN": {
+                        "Ref": "ElasticSearchDomianARN"
+                    },
+                    "IndexName": "stream-metadata",
+                    "IndexRotationPeriod": "NoRotation",
+                    "TypeName": "datalake-metadata-3",
+                    "RetryOptions": {
+                        "DurationInSeconds": "60"
+                    },
+                    "RoleARN": {
+                        "Ref": "FirehoseDeliveryRoleARN"
+                    },
+                    "S3BackupMode": "AllDocuments",
+                    "S3Configuration": {
+                        "BucketARN": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "arn:aws:s3:::",
+                                    {
+                                        "Ref": "TransformedFirehoseBucket"
+                                    }
+                                ]
+                            ]
+                        },
+                        "BufferingHints": {
+                            "IntervalInSeconds": "60",
+                            "SizeInMBs": "1"
+                        },
+                        "CompressionFormat": "UNCOMPRESSED",
+                        "Prefix": "Temp/Firehose5_output/",
+                        "RoleARN": {
+                            "Ref": "FirehoseDeliveryRoleARN"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "DataCleaningInputStream": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream1"
+            }
+        },
+        "DataCleaningOutputStream": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream2"
+            }
+        },
+        "DataAggregationOutputStream1": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream3"
+            }
+        },
+        "DataAggregationOutputStream2": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream4"
+            }
+        },
+        "DataAggregationOutputStream3": {
+            "Value": {
+                "Ref": "KinesisFirehoseDeliveryStream5"
+            }
+        }
+    }
+}

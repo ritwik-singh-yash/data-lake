@@ -1,0 +1,373 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Creates AWS Glue resources.  **WARNING**  You will be billed for the AWS resources used if you create a stack from this template.",
+	"Parameters": {
+		"AWSGlueCuratedDatasetsCrawlerRoleName": {
+			"Type": "String"
+		},
+		"BucketRaw": {
+			"Type": "String"
+		},
+		"BucketTransformed": {
+			"Type": "String"
+		},
+		"BucketPublished": {
+			"Type": "String"
+		},
+		"LogsBucket": {
+			"Type": "String"
+		},
+		"RedshiftPassword": {
+			"Type": "String"
+		},
+		"RedshiftUsername": {
+			"Type": "String"
+		},
+		"RedshiftRoleARN": {
+			"Type": "String"
+		},
+		"DatabaseName": {
+			"Type": "String"
+		},
+		"DatabasePort": {
+			"Type": "String"
+		},
+		"ConnectionURL": {
+			"Type": "String"
+		},
+		"HostURL": {
+			"Type": "String"
+		},
+		"QSS3BucketName": {
+			"AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+			"ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+			"Default": "sa-devops",
+			"Description": "S3 bucket where the Quick Start templates and scripts are installed. Use this parameter to specify the S3 bucket name you’ve created for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. The bucket name can include numbers, lowercase letters, uppercase letters, and hyphens, but should not start or end with a hyphen.",
+			"Type": "String"
+		},
+		"QSS3KeyPrefix": {
+			"AllowedPattern": "^[0-9a-zA-Z-/]*$",
+			"ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.",
+			"Default": "datalake-ritwik",
+			"Description": "S3 key prefix used to simulate a folder for your copy of Quick Start assets, if you decide to customize or extend the Quick Start for your own use. This prefix can include numbers, lowercase letters, uppercase letters, hyphens, and forward slashes.",
+			"Type": "String"
+		}
+	},
+	"Resources": {
+		"GlueRedshiftConnection": {
+			"Type": "AWS::Glue::Connection",
+			"Properties": {
+				"ConnectionInput": {
+					"Description": "Glue connection with redshift",
+					"ConnectionType": "JDBC",
+					"ConnectionProperties": {
+						"Name": {
+							"Fn::Join": [
+								"-", [
+									"yash-quickstart-datalake-redshift-connection-cf",
+									{
+										"Ref": "AWS::AccountId"
+									},
+									{
+										"Ref": "AWS::Region"
+									}
+								]
+							]
+						},
+						"Type": "Amazon Redshift",
+						"USERNAME": {
+							"Ref": "RedshiftUsername"
+						},
+						"JDBC_CONNECTION_URL": {
+							"Ref": "ConnectionURL"
+						},
+						"PASSWORD": {
+							"Ref": "RedshiftPassword"
+						}
+					},
+					"Name": {
+						"Fn::Join": [
+							"-", [
+								"yash-quickstart-datalake-redshift-connection-cf",
+								{
+									"Ref": "AWS::AccountId"
+								},
+								{
+									"Ref": "AWS::Region"
+								}
+							]
+						]
+					}
+				},
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				}
+			}
+		},
+		"RawBucketDB": {
+			"Type": "AWS::Glue::Database",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseInput": {
+					"Name": {
+						"Fn::Join": [
+							"-", [
+								"yash-quickstart-datalake-raw-bucket-db-cf",
+								{
+									"Ref": "AWS::AccountId"
+								},
+								{
+									"Ref": "AWS::Region"
+								}
+							]
+						]
+					},
+					"Description": "Data Lake Quick Start Curated Datasets"
+				}
+			}
+		},
+		"TransformedBucketDB": {
+			"Type": "AWS::Glue::Database",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseInput": {
+					"Name": {
+						"Fn::Join": [
+							"-", [
+								"yash-quickstart-datalake-transformed-bucket-db-cf",
+								{
+									"Ref": "AWS::AccountId"
+								},
+								{
+									"Ref": "AWS::Region"
+								}
+							]
+						]
+					},
+					"Description": "Data Lake Quick Start Curated Datasets"
+				}
+			}
+		},
+		"PublishedBucketDB": {
+			"Type": "AWS::Glue::Database",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseInput": {
+					"Name": {
+						"Fn::Join": [
+							"-", [
+								"yash-quickstart-datalake-published-bucket-db-cf",
+								{
+									"Ref": "AWS::AccountId"
+								},
+								{
+									"Ref": "AWS::Region"
+								}
+							]
+						]
+					},
+					"Description": "Data Lake Quick Start Curated Datasets"
+				}
+			}
+		},
+		"RedshiftDB": {
+			"Type": "AWS::Glue::Database",
+			"Properties": {
+				"CatalogId": {
+					"Ref": "AWS::AccountId"
+				},
+				"DatabaseInput": {
+					"Name": {
+						"Fn::Join": [
+							"-", [
+								"yash-quickstart-datalake-redshift-db-cf",
+								{
+									"Ref": "AWS::AccountId"
+								},
+								{
+									"Ref": "AWS::Region"
+								}
+							]
+						]
+					},
+					"Description": "Data Lake Quick Start Curated Datasets"
+				}
+			}
+		},
+		"RawCrawler": {
+			"Type": "AWS::Glue::Crawler",
+			"Properties": {
+				"Role": {
+					"Ref": "AWSGlueCuratedDatasetsCrawlerRoleName"
+				},
+				"DatabaseName": {
+					"Ref": "RawBucketDB"
+				},
+				"Targets": {
+					"S3Targets": [{
+						"Path": {
+							"Fn::Sub": "s3://${BucketRaw}/"
+						},
+						"Exclusions": [
+							"**_common_metadata",
+							 "Orders_Stream/**",
+							"**_metadata"
+						]
+					}]
+				},
+				"Name": {
+					"Fn::Join": [
+						"-", [
+							"RawCrawler",
+							{
+								"Ref": "AWS::AccountId"
+							},
+							{
+								"Ref": "AWS::Region"
+							}
+						]
+					]
+				}
+			}
+		},
+		"TransformedCrawler": {
+			"Type": "AWS::Glue::Crawler",
+			"Properties": {
+				"Role": {
+					"Ref": "AWSGlueCuratedDatasetsCrawlerRoleName"
+				},
+				"DatabaseName": {
+					"Ref": "TransformedBucketDB"
+				},
+				"Targets": {
+					"S3Targets": [{
+						"Path": {
+							"Fn::Sub": "s3://${BucketTransformed}/"
+						},
+						"Exclusions": [
+							"**_common_metadata",
+							"Temp/**",
+							"Orders_Stream/**",
+							"**_metadata"
+						]
+					}]
+				},
+				"Name": {
+					"Fn::Join": [
+						"-", [
+							"TransformedCrawler",
+							{
+								"Ref": "AWS::AccountId"
+							},
+							{
+								"Ref": "AWS::Region"
+							}
+						]
+					]
+				}
+			}
+		},
+		"PublishedCrawler": {
+			"Type": "AWS::Glue::Crawler",
+			"Properties": {
+				"Role": {
+					"Ref": "AWSGlueCuratedDatasetsCrawlerRoleName"
+				},
+				"DatabaseName": {
+					"Ref": "PublishedBucketDB"
+				},
+				"Targets": {
+					"S3Targets": [{
+						"Path": {
+							"Fn::Sub": "s3://${BucketPublished}/"
+						},
+						"Exclusions": [
+							"**_common_metadata",
+							"**_metadata"
+						]
+					}]
+				},
+				"Name": {
+					"Fn::Join": [
+						"-", [
+							"PublishedCrawler",
+							{
+								"Ref": "AWS::AccountId"
+							},
+							{
+								"Ref": "AWS::Region"
+							}
+						]
+					]
+				}
+			}
+		},
+		"RedshiftCrawler": {
+			"Type": "AWS::Glue::Crawler",
+			"Properties": {
+				"Role": {
+					"Ref": "AWSGlueCuratedDatasetsCrawlerRoleName"
+				},
+				"DatabaseName": {
+					"Ref": "RedshiftDB"
+				},
+				"Targets": {
+					"JdbcTargets": [{
+						"ConnectionName": {
+							"Ref": "GlueRedshiftConnection"
+						},
+						"Path": {
+							"Fn::Sub": "${DatabaseName}/public/%"
+						}
+					}]
+				},
+				"Name": {
+					"Fn::Join": [
+						"-", [
+							"RedshiftCrawler",
+							{
+								"Ref": "AWS::AccountId"
+							},
+							{
+								"Ref": "AWS::Region"
+							}
+						]
+					]
+				}
+			}
+		}
+	},
+	"Outputs": {
+		"RawCrawler": {
+			"Value": {
+				"Ref": "RawCrawler"
+			}
+		},
+		"TransformedCrawler": {
+			"Value": {
+				"Ref": "TransformedCrawler"
+			}
+		},
+		"PublishedCrawler": {
+			"Value": {
+				"Ref": "PublishedCrawler"
+			}
+		},
+		"RedshiftCrawler": {
+			"Value": {
+				"Ref": "RedshiftCrawler"
+			}
+		},
+		"ConnectionURL": {
+			"Value": {
+				"Ref": "ConnectionURL"
+			}
+		}
+	}
+}

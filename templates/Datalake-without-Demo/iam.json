@@ -1,0 +1,207 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS CloudFormation template to create IAM roles",
+	"Parameters": {        
+        "TransformedDatasets": {
+            "Default": "",
+            "Description": "Enter Bucket Name for Firehose1 storing data",
+            "Type": "String"
+        }
+	},
+    "Resources": {
+        "RedshiftRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "redshift.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Path": "/",
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+                    "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "GlueRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "glue.amazonaws.com"
+                            }
+                        }
+                    ],
+                    "Version": "2012-10-17"
+                },
+                "Path": "/",
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/AmazonRDSFullAccess",
+                    "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
+                    "arn:aws:iam::aws:policy/AmazonS3FullAccess",
+                    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole",
+                    "arn:aws:iam::aws:policy/AmazonAthenaFullAccess",
+                    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
+                    "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess",
+                    "arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess"
+                ]
+            },
+            "Type": "AWS::IAM::Role"
+        },
+        "FirehoseDeliveryRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "firehose.amazonaws.com",
+                                    "es.amazonaws.com"
+                                ]
+                            },
+                            "Action": "sts:AssumeRole",
+                            "Condition": {
+                                "StringEquals": {
+                                    "sts:ExternalId": {
+                                        "Ref": "AWS::AccountId"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "KinesisESPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "*",
+                                    "Resource": "*"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "PolicyName": "firehose_delivery_policy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:AbortMultipartUpload",
+                                        "s3:GetBucketLocation",
+                                        "s3:GetObject",
+                                        "s3:ListBucket",
+                                        "s3:ListBucketMultipartUploads",
+                                        "s3:PutObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "TransformedDatasets"
+                                                    }
+                                                ]
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "",
+                                                [
+                                                    "arn:aws:s3:::",
+                                                    {
+                                                        "Ref": "TransformedDatasets"
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:DescribeLogStreams",
+                                        "logs:PutLogEvents"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "es: *"
+                                    ],
+                                    "Resource": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    },    
+    "Outputs": {
+        "RedshiftRoleARN": {
+            "Description": "ARN of RedshiftRole",
+            "Value": {
+                "Fn::GetAtt": [
+                    "RedshiftRole",
+                    "Arn"
+                ]
+            }
+        },
+        "GlueRoleARN": {
+            "Description": "ARN of GlueRole",
+            "Value": {
+                "Fn::GetAtt": [
+                    "GlueRole",
+                    "Arn"
+                ]
+            }
+        },
+		"GlueRoleName": {
+            "Description": "Name of GlueRole",            
+            "Value": {
+                "Ref" : "GlueRole"
+            }
+        },
+        "FirehoseDeliveryRoleARN": {
+            "Description": "ARN of FirehoseDeliveryRole",
+            "Value": {
+                "Fn::GetAtt": [
+                    "FirehoseDeliveryRole",
+                    "Arn"
+                ]
+            }
+        }
+    }
+}
